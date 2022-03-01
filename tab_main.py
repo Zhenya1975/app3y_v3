@@ -21,6 +21,12 @@ def maintanance_chart_tab():
                 # колонка с фильтрами
                 dbc.Col(width=2,
                   children=[
+                    html.P(id="empty"), 
+                    dbc.Button("Обновить", id="btn_update", size="sm",
+                                                 style={'marginBottom': '3px',
+                                                        'marginTop': '3px',
+                                                        'backgroundColor': '#232632'},),
+                    html.Hr(),
                     
                     html.P(),
                     html.Div([

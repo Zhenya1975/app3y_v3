@@ -10,7 +10,7 @@ def full_eo_list_actual_func():
   full_eo_list_actual = full_eo_list_actual.astype({'strategy_id': int, 'avearage_day_operation_hours': float})
   
   return full_eo_list_actual
-# print("full_eo_list_actual_func() info ", full_eo_list_actual_func().info())
+
 
 
 
@@ -22,7 +22,7 @@ def full_eo_list_func():
   full_eo_list = full_eo_list.astype({'strategy_id': int, 'avearage_day_operation_hours': float})
 
   return full_eo_list
-# print("full_eo_list_func().info(): ",full_eo_list_func().info())
+
 
 def last_maint_date_func():
   last_maint_date = pd.read_csv('data/last_maint_date.csv')
@@ -30,9 +30,15 @@ def last_maint_date_func():
 
   
   return last_maint_date
-# print(last_maint_date_func().info()) 
 
 
+def maintanance_jobs_df():
+  """чтение maintanance_jobs_df"""
+  maintanance_jobs_df = pd.read_csv('data/maintanance_jobs_df.csv', dtype = str)
+  maintanance_jobs_df = maintanance_jobs_df.astype({'dowtime_plan, hours': float, "month_year_sort_index": int})
+  
+  return maintanance_jobs_df
+  
 
 def maintanance_job_list_general_func():
   maintanance_job_list_general = pd.read_csv('data/maintanance_job_list_general.csv')
@@ -197,7 +203,7 @@ def maintanance_jobs_df_prepare():
   # читаем файл eo_job_catologue
   eo_job_catologue_df = eo_job_catologue_df_func()
   full_eo_list = full_eo_list_func()
-  # print(full_eo_list.info())
+
   # выдергиваем из full_eo_list 'eo_code', 'avearage_day_operation_hours'
   full_eo_list_selected = full_eo_list.loc[:, ['eo_code', 'avearage_day_operation_hours']]
 
@@ -333,9 +339,7 @@ def maintanance_jobs_df_prepare():
   
         temp_dict['days_between_maintanance'] = days_between_maintanance
         temp_dict['next_maintanance_datetime'] = next_maintanance_datetime
-        # print("type maintanance_datetime: ", maintanance_datetime)
-        # print("type operation_start_date: ", operation_start_date)
-        # print("type operation_finish_date: ", operation_finish_date)
+
         
         if maintanance_datetime >= operation_start_date and maintanance_datetime <= operation_finish_date:
           maintanance_jobs_result_list.append(temp_dict)
@@ -356,8 +360,14 @@ def maintanance_jobs_df_prepare():
   maintanance_jobs_df = pd.merge(maintanance_jobs_df, eo_model_id_eo_list, on='eo_code', how = 'left')
   
   maintanance_jobs_df['maintanance_date'] = maintanance_jobs_df['maintanance_date'].astype(str)
+  maintanance_jobs_df['year'] = maintanance_jobs_df['maintanance_datetime'].dt.year
+  maintanance_jobs_df['month'] = maintanance_jobs_df['maintanance_datetime'].dt.month
+  maintanance_jobs_df['month_year'] = maintanance_jobs_df['month'].astype('str') + "_"+ maintanance_jobs_df['year'].astype('str')
+  sort_index_month_year ={'1_2023':1,'2_2023':2,'3_2023':3,'4_2023':4,'5_2023':5,'6_2023':6,'7_2023':7,'8_2023':8,'9_2023':9,'10_2023':10,'11_2023':11,'12_2023':12,'1_2024':13,'2_2024':14,'3_2024':15,'4_2024':16,'5_2024':17,'6_2024':18,'7_2024':19,'8_2024':20,'9_2024':21,'10_2024':22,'11_2024':23,'12_2024':24,'1_2025':25,'2_2025':26,'3_2025':27,'4_2025':28,'5_2025':29,'6_2025':30,'7_2025':31,'8_2025':32,'9_2025':33,'10_2025':34,'11_2025':35,'12_2025':36}
 
-  maintanance_jobs_df.to_csv('data/maintanance_jobs_df.csv')
+  maintanance_jobs_df['month_year_sort_index'] = maintanance_jobs_df['month_year'].map(sort_index_month_year)
+  
+  maintanance_jobs_df.to_csv('data/maintanance_jobs_df.csv', index = False)
 
   return maintanance_jobs_df
 

@@ -7,6 +7,8 @@ from dash_bootstrap_templates import load_figure_template
 import datetime
 
 import tab_main
+import functions
+import widget_fig_downtime
 # import tab_coverage
 # import tab_settings
 
@@ -122,8 +124,40 @@ app.layout = dbc.Container(
 
 
 ######################### ОСНОВНОЙ ОБРАБОТЧИК ДЛЯ ПОСТРОЕНИЯ ГРАФИКОВ ##############################
+@app.callback([
+    Output('planned_downtime', 'figure'),
+    Output('loading', 'parent_style'),
+
+],
+    [
+      Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
+      Input("btn_update", "n_clicks"),
+
+    ],
+)
+
+def maintanance(theme_selector, btn_update_n_click):
+  
+  changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+  if theme_selector:
+      graph_template = 'sandstone'
+  # bootstrap
+
+  else:
+      graph_template = 'plotly_dark'
+
+  maintanance_jobs_df = functions.maintanance_jobs_df()
+  # при нажатии на кнопку обновляем csv для построения графиков
+  if btn_update_n_click:
+    
+    print("нажали кнопку")
+    widget_fig_downtime.fig_downtime_by_years_data(maintanance_jobs_df)
+  
+  fig_downtime = widget_fig_downtime.fig_downtime_by_years(maintanance_jobs_df, theme_selector)
 
 
+  new_loading_style = loading_style
+  return fig_downtime, new_loading_style
 
 
 if __name__ == "__main__":
