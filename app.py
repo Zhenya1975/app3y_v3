@@ -151,6 +151,7 @@ def maintanance(theme_selector, btn_update_n_click):
   if btn_update_n_click:
     
     print("нажали кнопку")
+    # Обновление данных для построения графика
     widget_fig_downtime.fig_downtime_by_years_data(maintanance_jobs_df)
   
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(maintanance_jobs_df, theme_selector)

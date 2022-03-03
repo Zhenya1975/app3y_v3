@@ -3,8 +3,10 @@ import initial_values
 from datetime import timedelta
 
 def full_eo_list_actual_func():
-  """чтение full_eo_list"""
+  """чтение full_eo_list_actual"""
   full_eo_list_actual = pd.read_csv('data/full_eo_list_actual.csv', dtype = str)
+  # level_1_df = pd.read_csv("data/level_1.csv", dtype=str)
+  # full_eo_list_actual = pd.merge(full_eo_list_actual, level_1_df, on = 'level_1', how = 'left')
   full_eo_list_actual["operation_start_date"] = pd.to_datetime(full_eo_list_actual["operation_start_date"])
   full_eo_list_actual["operation_finish_date"] = pd.to_datetime(full_eo_list_actual["operation_finish_date"])
   full_eo_list_actual = full_eo_list_actual.astype({'strategy_id': int, 'avearage_day_operation_hours': float})
@@ -133,8 +135,8 @@ def maintanance_category_prep():
 def select_eo_for_calculation():
   """Выборка ео из полного списка full_eo_list_actual в full_eo_list"""
   full_eo_list_actual_df = full_eo_list_actual_func()
-  
-  strategy_list_df = pd.read_csv('data/strategy_list.csv', dtype = str)
+  # print(full_eo_list_actual_df)
+  strategy_list_df = pd.read_csv('data/strategy_list.csv')
   strategy_list = strategy_list_df['strategy_id'].unique()
   eo_list_for_calculation = full_eo_list_actual_df.loc[full_eo_list_actual_df['strategy_id'].isin(strategy_list)]
   eo_list_for_calculation.to_csv('data/full_eo_list.csv', index = False)
