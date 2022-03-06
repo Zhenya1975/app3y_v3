@@ -37,13 +37,26 @@ eo_teh_karta_df.to_csv('data/eo_teh_karta_df.csv', index = False)
 ################### СУЩЕСТВУЮЩИЕ ПЛАНЫ ТОРО ############################
 plans_toro_df = pd.read_csv('data/plans_toro.csv', dtype = str)
 plans_toro_df['strategy_str'] = plans_toro_df['strategy'].astype(str) + "_str"
-plans_toro_df['strategy_str_counter'] = plans_toro_df['strategy_str'].astype(str) + plans_toro_df['СчетГруппТехкарт'].astype(str)
-# print(plans_toro_df.info())
+
+
+plans_toro_df['updated-counter']  = plans_toro_df['СчетГруппТехкарт'].astype(str)
+
+# print(plans_toro_df['updated-counter'])
+# список счетчиков, которые нужно заменить в строках планов
+update_counter_dict = {"48": 'Д2',"40":'Д1'}
+# plans_toro_df['updated-counter'] = plans_toro_df['СчетГруппТехкарт'].map(update_counter_dict)
+plans_toro_df['updated-counter'].map(update_counter_dict)
+
 plans_toro_df.to_csv('data/plans_toro_delete.csv', index = False)
+
+plans_toro_df['strategy_str_counter'] = plans_toro_df['strategy_str'].astype(str) + plans_toro_df['updated-counter'].astype(str)
+
+
+
 
 # print(plans_toro_df['strategy_str])
 							
-plans_toro_df_selected = plans_toro_df.loc[:, ['ПозПредупредТОРО', 'ПланПредупрТОРО', 'Позиция предупред. ТОРО - описание', 'Группа плановиков', 'Единица оборудования', 'Вид работы ТОРО', 'Вид заказа', 'Тип техкарты', 'Группа','СчетГруппТехкарт', 'strategy_str_counter']]
+plans_toro_df_selected = plans_toro_df.loc[:, ['ПозПредупредТОРО', 'ПланПредупрТОРО', 'Позиция предупред. ТОРО - описание', 'Группа плановиков', 'Единица оборудования', 'Вид работы ТОРО', 'Вид заказа', 'Тип техкарты', 'Группа','СчетГруппТехкарт', 'updated-counter', 'strategy_str_counter']]
 # plans_toro_df_selected['Страт. предупр. ТОРО'] = plans_toro_df_selected['Страт. предупр. ТОРО'].astype(str)
 plans_toro_df_selected.to_csv('data/plans_toro_df_selected.csv', index = False)
 
