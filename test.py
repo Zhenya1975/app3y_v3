@@ -110,7 +110,7 @@ eo_plan_toro_strategy_df = pd.merge(eo_plan_toro_df, strategy_forms_df_selected,
 eo_plan_toro_strategy_df.to_csv('data/strategy_forms_df_selected_delete.csv')
 
 eo_plan_toro_strategy_df = eo_plan_toro_strategy_df.loc[:, ['БЕ', 'класс ео', 'Модель оборудования', 'Наименование оборудования', 'strategy_str_counter',
-                                                            'Группа', 'СчетГруппТехкарт', 'Позиция предупред. ТОРО - описание','Текст цикла ПредупрТОРО',
+                                                            'Группа', 'СчетГруппТехкарт', 'ПланПредупрТОРО', 'Позиция предупред. ТОРО - описание','Текст цикла ПредупрТОРО',
                                                             'gruppa_str_counter','Трудоёмкость ТК, ч', 'Продолжительность операций ТК, ч'
                                                             ]]
 
