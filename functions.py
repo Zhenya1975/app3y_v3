@@ -43,11 +43,13 @@ def maintanance_jobs_df():
   
 
 def maintanance_job_list_general_func():
+  """чтение maintanance_job_list_general"""
   maintanance_job_list_general = pd.read_csv('data/maintanance_job_list_general.csv')
   maintanance_job_list_general = maintanance_job_list_general.astype({'downtime_planned': float, 'strategy_id': int})
   return maintanance_job_list_general
 
 def eo_job_catologue_df_func():
+  """чтение eo_job_catologue_df"""
   eo_job_catologue_df = pd.read_csv('data/eo_job_catologue.csv', dtype = str)
   eo_job_catologue_df["downtime_planned"] = eo_job_catologue_df["downtime_planned"].astype('float')
   eo_job_catologue_df["operation_start_date"] = pd.to_datetime(eo_job_catologue_df["operation_start_date"])
