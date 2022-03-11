@@ -372,6 +372,8 @@ def maintanance_jobs_df_prepare():
   maintanance_jobs_df['maintanance_date'] = maintanance_jobs_df['maintanance_date'].astype(str)
   maintanance_jobs_df['year'] = maintanance_jobs_df['maintanance_datetime'].dt.year
   maintanance_jobs_df['month'] = maintanance_jobs_df['maintanance_datetime'].dt.month
+  maintanance_jobs_df['day'] = maintanance_jobs_df['maintanance_datetime'].dt.day
+  maintanance_jobs_df['hour'] = maintanance_jobs_df['maintanance_datetime'].dt.hour
   maintanance_jobs_df['month_year'] = maintanance_jobs_df['month'].astype('str') + "_"+ maintanance_jobs_df['year'].astype('str')
   sort_index_month_year ={'1_2023':1,'2_2023':2,'3_2023':3,'4_2023':4,'5_2023':5,'6_2023':6,'7_2023':7,'8_2023':8,'9_2023':9,'10_2023':10,'11_2023':11,'12_2023':12,'1_2024':13,'2_2024':14,'3_2024':15,'4_2024':16,'5_2024':17,'6_2024':18,'7_2024':19,'8_2024':20,'9_2024':21,'10_2024':22,'11_2024':23,'12_2024':24,'1_2025':25,'2_2025':26,'3_2025':27,'4_2025':28,'5_2025':29,'6_2025':30,'7_2025':31,'8_2025':32,'9_2025':33,'10_2025':34,'11_2025':35,'12_2025':36}
 
@@ -399,6 +401,7 @@ def fill_calendar_fond():
   # making separate first name column from new data frame
   # eo_list_under_maintanance_program["eo_code"]= new[0]
 
+  
   eo_list = eo_list_under_maintanance_program['eo_code'].unique()
 
   result_list = []
@@ -414,7 +417,68 @@ def fill_calendar_fond():
       maint_date = maint_date + timedelta(hours=24)
 
   eo_calendar_fond = pd.DataFrame(result_list)
-  eo_calendar_fond.to_csv('data/eo_calendar_fond.csv')
+  
+
+
+###################### РАСЧЕТ КАЛЕНДАРНОГО ФОНДА И ПРОСТОЕВ ПО ЧАСАМ НА ТРИ ГОДА ######################
+def hour_calculation():
+  """РАСЧЕТ КАЛЕНДАРНОГО ФОНДА И ПРОСТОЕВ ПО ЧАСАМ НА ТРИ ГОДА"""
+  # необходимо получить дефолтную таблицу с нулями
+  # Для этого берем начальную точку в нуле часов 1 января 2023 года, прибавляем час и записываем новую строку
+  start_point = pd.to_datetime('01.01.2023', format='%d.%m.%Y')
+  
+  # Список ЕО для почасовой модели
+  full_eo_list = full_eo_list_func()
+  # full_eo_list.to_csv('data/full_eo_list_delete.csv')
+  full_eo_list = full_eo_list.loc[:, ['eo_code', 'operation_start_date', 'operation_finish_date']]
+  
+  ###################  ОГРАНИЧИМСЯ ДЛЯ ТЕСТИРОВАНИЯ ОДНОЙ МАШИНОЙ И ОДНИМ ГОДОМ #################
+  eo_list = full_eo_list.loc[full_eo_list['eo_code'] == '100000062390']
+  # eo_list.to_csv('data/eo_list_delete.csv')
+  # operation_finish_date = pd.to_datetime('31.12.2023', format='%d.%m.%Y')
+  # eo_list = full_eo_list
+  # print(eo_list)
+  # eo_list = full_eo_list.loc[:, ['eo_code', 'operation_start_date', 'operation_finish_date']]
+
+  result_df_list = []
+  for row in eo_list.itertuples():
+    temp_dict = {}
+    eo_code = getattr(row, "eo_code")
+    operation_start_date = getattr(row, "operation_start_date")
+    operation_finish_date = getattr(row, "operation_finish_date")
+    current_hour = start_point
+    
+    while current_hour < last_day_of_selection:
+      
+      temp_dict['eo_code'] = eo_code
+      temp_dict['model_hour'] = current_hour
+      if current_hour > operation_start_date and current_hour< operation_finish_date:
+        temp_dict['calendar_fond_status'] = 1
+      else:
+        temp_dict['calendar_fond_status'] = 0
+      
+      temp_dict['downtime_status'] = 0
+     
+      result_df_list.append(temp_dict)
+      current_hour = current_hour + timedelta(hours=1)
+      temp_dict = {}
+
+  model_hours_df = pd.DataFrame(result_df_list)
+  
+  print("model_hours_df info: ", model_hours_df.info())
+  model_hours_df.to_csv('data/model_hours_df_delete.csv')
+  
+
+  # model_hours_df_partial = model_hours_df.loc[ model_hours_df['eo_code'] == '100000084492']
+  # model_hours_df_partial = model_hours_df_partial.loc[model_hours_df['model_hour'] < pd.to_datetime('01.03.2023', format='%d.%m.%Y')]
+  # print(model_hours_df_partial['model_hour'])
+  
+  # print("Количество машин в списке: ", len(full_eo_list))
+  # print("сумма единичек в календарном фонде", model_hours_df['calendar_fond_status'].sum())
+  
+  
+hour_calculation()
+
 
 
 def ktg_by_month_models():
@@ -435,21 +499,21 @@ def ktg_by_month_models():
 ################# ЗАПУСК ФУНКЦИЙ #############################
 
 
-full_eo_list_actual_func()
-select_eo_for_calculation()
-full_eo_list_func()
+# full_eo_list_actual_func()
+# select_eo_for_calculation()
+# full_eo_list_func()
 # last_maint_date_func()
 # functions.pass_interval_fill() '''создание списка pass interval в maintanance_job_list_general'''
-pass_interval_fill()
+# pass_interval_fill()
 
 # functions.maintanance_category_prep() """Создание файла со списком категорий работ ТОИР"""
-maintanance_category_prep()
+# maintanance_category_prep()
 
 # functions.select_eo_for_calculation() """Выборка ео из полного списка full_eo_list_actual в full_eo_list"""
 # select_eo_for_calculation()
 
 # functions.eo_job_catologue():'''создание файла eo_job_catologue: список оборудование - работа на оборудовании'''
-eo_job_catologue()
+# eo_job_catologue()
 
 
 # maintanance_jobs_df_prepare()
