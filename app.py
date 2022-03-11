@@ -9,6 +9,7 @@ import datetime
 import tab_main
 import functions
 import widget_fig_downtime
+import ktg_table_html
 # import tab_coverage
 # import tab_settings
 
@@ -126,6 +127,7 @@ app.layout = dbc.Container(
 ######################### ОСНОВНОЙ ОБРАБОТЧИК ДЛЯ ПОСТРОЕНИЯ ГРАФИКОВ ##############################
 @app.callback([
     Output('planned_downtime', 'figure'),
+    Output('ktg_by_month_table', 'children'),
     Output('loading', 'parent_style'),
 
 ],
@@ -157,8 +159,11 @@ def maintanance(theme_selector, btn_update_n_click):
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(maintanance_jobs_df, theme_selector)
 
 
+
+  ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
+
   new_loading_style = loading_style
-  return fig_downtime, new_loading_style
+  return fig_downtime, ktg_by_month_table, new_loading_style
 
 
 if __name__ == "__main__":

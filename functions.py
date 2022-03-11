@@ -1,6 +1,9 @@
 import pandas as pd
 import initial_values
 from datetime import timedelta
+first_day_of_selection = initial_values.first_day_of_selection
+last_day_of_selection = initial_values.last_day_of_selection
+
 
 def full_eo_list_actual_func():
   """чтение full_eo_list_actual"""
@@ -196,8 +199,7 @@ def eo_job_catologue():
 ##################################################################################################
 def maintanance_jobs_df_prepare():
   '''подготовка файла со списком работ - основной файл для построения графика простоев'''
-  first_day_of_selection = initial_values.first_day_of_selection
-  last_day_of_selection = initial_values.last_day_of_selection
+
   #eo_maintanance_plan_update_start_date_df = maintanance_eo_list_start_date_df_prepare()
   #eo_maintanance_plan_update_start_date_df.drop(columns=['last_maintanance_date'], inplace=True)
   
@@ -242,7 +244,9 @@ def maintanance_jobs_df_prepare():
     go_interval = getattr(row, "go_interval")
 
     start_point = pd.to_datetime(start_point, format='%d.%m.%Y')
-    
+    last_day_of_selection = initial_values.last_day_of_selection
+
+
     maintanance_datetime = start_point
     # если это ежедневное обслуживание, то расставляем через каждые 24 часа
     if maintanance_name == 'ЕТО':
@@ -250,23 +254,23 @@ def maintanance_jobs_df_prepare():
         ########################################################################
         ######### ВРЕМЕННО ОТКЛЮЧАЕМ ДОБАВЛЕНИЕ СТРОК С ЕТО. КОГДА МОДЕЛЬ БУДЕТ ГОТОВА ТО ВКЛЮЧАЕМ СНОВА #################
       continue
-      while maintanance_datetime < last_day_of_selection:
-        temp_dict = {}
-        temp_dict['maintanance_job_code'] = maintanance_job_code
-        temp_dict['eo_code'] = eo_code
-        temp_dict['interval_motohours'] = standard_interval_motohours
-        temp_dict['maint_interval'] = 24
-        temp_dict['dowtime_plan, hours'] = plan_downtime
-        temp_dict['maintanance_datetime'] = maintanance_datetime
-        temp_dict['maintanance_date'] = maintanance_datetime.date()
-        temp_dict['maintanance_category_id'] = maintanance_category_id
-        temp_dict['maintanance_name'] = maintanance_name
-        # temp_dict['avearage_day_operation_hours'] = avearage_day_operation_hours
-        
-        maintanance_datetime = maintanance_datetime + timedelta(hours=24)
-        if maintanance_datetime >= operation_start_date and maintanance_datetime <= operation_finish_date:
-          maintanance_jobs_result_list.append(temp_dict)
-        temp_dict = {}
+      # while maintanance_datetime < last_day_of_selection:
+      #   temp_dict = {}
+      #   temp_dict['maintanance_job_code'] = maintanance_job_code
+      #   temp_dict['eo_code'] = eo_code
+      #   temp_dict['interval_motohours'] = standard_interval_motohours
+      #   temp_dict['maint_interval'] = 24
+      #   temp_dict['dowtime_plan, hours'] = plan_downtime
+      #   temp_dict['maintanance_datetime'] = maintanance_datetime
+      #   temp_dict['maintanance_date'] = maintanance_datetime.date()
+      #   temp_dict['maintanance_category_id'] = maintanance_category_id
+      #   temp_dict['maintanance_name'] = maintanance_name
+      #   # temp_dict['avearage_day_operation_hours'] = avearage_day_operation_hours
+      #
+      #   maintanance_datetime = maintanance_datetime + timedelta(hours=24)
+      #   if maintanance_datetime >= operation_start_date and maintanance_datetime <= operation_finish_date:
+      #     maintanance_jobs_result_list.append(temp_dict)
+      #   temp_dict = {}
     # если у формы нет поглащений другими формами, то расставляем через каждый интервал между формами
     elif maintanance_name != 'ЕТО' and pass_interval == 'not':
     
@@ -360,7 +364,7 @@ def maintanance_jobs_df_prepare():
   maintanance_jobs_df = maintanance_jobs_df.loc[maintanance_jobs_df['maintanance_datetime']<= last_day_of_selection]
   
   ############# прицепляем eo_model_id #############################
-  eo_model_id_eo_list = full_eo_list.loc[:, ['eo_code', 'eo_model_id']]
+  eo_model_id_eo_list = full_eo_list.loc[:, ['eo_code', 'eo_model_id', 'eo_model_name', 'level_upper']]
   maintanance_jobs_df = pd.merge(maintanance_jobs_df, eo_model_id_eo_list, on='eo_code', how = 'left')
   
   maintanance_jobs_df['maintanance_date'] = maintanance_jobs_df['maintanance_date'].astype(str)
@@ -370,10 +374,63 @@ def maintanance_jobs_df_prepare():
   sort_index_month_year ={'1_2023':1,'2_2023':2,'3_2023':3,'4_2023':4,'5_2023':5,'6_2023':6,'7_2023':7,'8_2023':8,'9_2023':9,'10_2023':10,'11_2023':11,'12_2023':12,'1_2024':13,'2_2024':14,'3_2024':15,'4_2024':16,'5_2024':17,'6_2024':18,'7_2024':19,'8_2024':20,'9_2024':21,'10_2024':22,'11_2024':23,'12_2024':24,'1_2025':25,'2_2025':26,'3_2025':27,'4_2025':28,'5_2025':29,'6_2025':30,'7_2025':31,'8_2025':32,'9_2025':33,'10_2025':34,'11_2025':35,'12_2025':36}
 
   maintanance_jobs_df['month_year_sort_index'] = maintanance_jobs_df['month_year'].map(sort_index_month_year)
-  
+
+  level_upper = pd.read_csv('data/level_upper.csv')
+
+  # джойним с level_upper
+  maintanance_jobs_df = pd.merge(maintanance_jobs_df, level_upper, on='level_upper', how='left')
+  # создаем поле-ключ teh-mesto-month-year
+  maintanance_jobs_df['teh_mesto_month_year'] = maintanance_jobs_df['level_upper'] + '_' + maintanance_jobs_df[
+    'month_year']
+
   maintanance_jobs_df.to_csv('data/maintanance_jobs_df.csv', index = False)
 
   return maintanance_jobs_df
+
+
+# заполняем календарный фонд по оборудованию
+# берем машины, кооторые участвуют в файле eo_job_catologue.csv
+def fill_calendar_fond():
+  eo_list_under_maintanance_program = pd.read_csv('data/eo_job_catologue.csv', dtype=str)
+  # new data frame with split value columns
+  # new = eo_list_under_maintanance_program['eo_code'].str.split(".", n = 1, expand = True)
+  # making separate first name column from new data frame
+  # eo_list_under_maintanance_program["eo_code"]= new[0]
+
+  eo_list = eo_list_under_maintanance_program['eo_code'].unique()
+
+  result_list = []
+  # итерируемся по списку еo
+  for eo in eo_list:
+    maint_date = first_day_of_selection
+    while maint_date < last_day_of_selection:
+      temp_dict = {}
+      temp_dict['eo_code'] = eo
+      temp_dict['datetime'] = maint_date
+      temp_dict['calendar_fond'] = 24
+      result_list.append(temp_dict)
+      maint_date = maint_date + timedelta(hours=24)
+
+  eo_calendar_fond = pd.DataFrame(result_list)
+  eo_calendar_fond.to_csv('data/eo_calendar_fond.csv')
+
+
+def ktg_by_month_models():
+  maintanance_jobs_df = maintanance_jobs_df_prepare()
+  eo_calendar_fond = fill_calendar_fond()
+  year = 2023
+
+
+
+  maintanance_jobs__for_zero_dowtime = maintanance_jobs_df.loc[:,
+                                       ['teh_mesto_month_year', 'level_upper', 'Название технического места',
+                                        'month_year', 'year']]
+  maintanance_jobs__for_zero_dowtime['dowtime_plan, hours'] = 0
+  maintanance_jobs__for_zero_dowtime_groupped = maintanance_jobs__for_zero_dowtime.groupby(
+    ['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)[
+    'dowtime_plan, hours'].sum()
+
+################# ЗАПУСК ФУНКЦИЙ #############################
 
 
 # full_eo_list_actual_func()
@@ -392,4 +449,6 @@ def maintanance_jobs_df_prepare():
 # eo_job_catologue()
 
 
-# maintanance_jobs_df_prepare()
+maintanance_jobs_df_prepare()
+
+# fill_calendar_fond()

@@ -13,7 +13,7 @@ eo_list.rename(columns={'level_1_description': 'БЕ', 'eo_code': 'EO', 'eo_mode
                         'eo_class_description': 'класс ео', 'eo_description': 'Наименование оборудования',
                         'teh_mesto': 'техместо', 'operation_start_date': 'Дата начала эксплуатации',
                         'constr_type': 'Тип конструкции'}, inplace=True)
-# eo_list.to_csv('data/eo_list_temp.csv', index = False)
+eo_list.to_csv('data/eo_list_temp.csv', index = False)
 
 
 
