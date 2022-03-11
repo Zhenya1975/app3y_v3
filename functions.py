@@ -156,6 +156,8 @@ def eo_job_catologue():
   maintanance_job_list_general_df.rename(columns={'upper_level_tehmesto_code': 'level_upper'}, inplace=True)
   full_eo_list = full_eo_list_func()
   eo_maintanance_plan_df = pd.merge(full_eo_list, maintanance_job_list_general_df, on = 'strategy_id', how='inner')
+
+  eo_maintanance_plan_df.to_csv('data/eo_maintanance_plan_df_delete.csv')
   
   # удаляем строки, в которых нет данных в колонке eo_main_class_code
   eo_maintanance_plan_df = eo_maintanance_plan_df.loc[eo_maintanance_plan_df['eo_main_class_code'] != 'no_data']
@@ -433,22 +435,23 @@ def ktg_by_month_models():
 ################# ЗАПУСК ФУНКЦИЙ #############################
 
 
-# full_eo_list_actual_func()
-# full_eo_list_func()
+full_eo_list_actual_func()
+select_eo_for_calculation()
+full_eo_list_func()
 # last_maint_date_func()
 # functions.pass_interval_fill() '''создание списка pass interval в maintanance_job_list_general'''
-# pass_interval_fill()
+pass_interval_fill()
 
 # functions.maintanance_category_prep() """Создание файла со списком категорий работ ТОИР"""
-# maintanance_category_prep()
+maintanance_category_prep()
 
 # functions.select_eo_for_calculation() """Выборка ео из полного списка full_eo_list_actual в full_eo_list"""
 # select_eo_for_calculation()
 
 # functions.eo_job_catologue():'''создание файла eo_job_catologue: список оборудование - работа на оборудовании'''
-# eo_job_catologue()
+eo_job_catologue()
 
 
-maintanance_jobs_df_prepare()
+# maintanance_jobs_df_prepare()
 
 # fill_calendar_fond()
