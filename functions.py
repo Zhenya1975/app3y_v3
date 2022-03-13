@@ -5,6 +5,7 @@ from datetime import timedelta
 first_day_of_selection = initial_values.first_day_of_selection
 last_day_of_selection = initial_values.last_day_of_selection
 
+
 # print(timedelta(hours=50.0))
 
 def full_eo_list_actual_func():
@@ -31,7 +32,8 @@ def full_eo_list_func():
 
 def last_maint_date_func():
     last_maint_date = pd.read_csv('data/last_maint_date.csv')
-    last_maint_date["last_maintanance_date"] = pd.to_datetime(last_maint_date["last_maintanance_date"], format='%d.%m.%Y')
+    last_maint_date["last_maintanance_date"] = pd.to_datetime(last_maint_date["last_maintanance_date"],
+                                                              format='%d.%m.%Y')
 
     return last_maint_date
 
@@ -170,7 +172,8 @@ def eo_job_catologue():
 
     eo_maintanance_plan_df = eo_maintanance_plan_df.loc[:,
                              ['eo_maintanance_job_code', 'strategy_id', 'eo_model_id', 'maintanance_code', 'eo_code',
-                              'eo_main_class_code', 'eo_description', 'maintanance_category_id', 'maintanance_name', 'interval_type',
+                              'eo_main_class_code', 'eo_description', 'maintanance_category_id', 'maintanance_name',
+                              'interval_type',
                               'interval_motohours', 'downtime_planned', 'pass_interval', 'go_interval',
                               'operation_start_date', 'operation_finish_date']].reset_index(drop=True)
     eo_job_catologue = eo_maintanance_plan_df
@@ -216,7 +219,8 @@ def maintanance_jobs_df_prepare():
     # eo_job_catologue_df = eo_job_catologue_df.loc[eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_36'])]
     # eo_job_catologue_df = eo_job_catologue_df.loc[eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_47'])]
     # eo_job_catologue_df = eo_job_catologue_df.loc[eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_37'])]
-    eo_job_catologue_df = eo_job_catologue_df.loc[eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_47','100000084492_37'])]
+    eo_job_catologue_df = eo_job_catologue_df.loc[
+        eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_47', '100000084492_37'])]
     full_eo_list = full_eo_list_func()
 
     # выдергиваем из full_eo_list 'eo_code', 'avearage_day_operation_hours'
@@ -277,7 +281,6 @@ def maintanance_jobs_df_prepare():
 
                 maintanance_start_datetime = maintanance_start_datetime + timedelta(hours=24)
 
-
                 if maintanance_start_datetime >= operation_start_date and maintanance_start_datetime <= operation_finish_date:
                     maintanance_jobs_result_list.append(temp_dict)
 
@@ -306,11 +309,13 @@ def maintanance_jobs_df_prepare():
                 calendar_interval_between_maint = number_of_days_to_next_maint * 24 + remaining_hours
 
                 ############## В зависимости от типа межсервисного интервала определяем момент следующего ТО ##################
-                next_maintanance_datetime = maintanance_start_datetime + timedelta(hours=calendar_interval_between_maint) + timedelta(hours=plan_downtime)
+                next_maintanance_datetime = maintanance_start_datetime + timedelta(
+                    hours=calendar_interval_between_maint) + timedelta(hours=plan_downtime)
                 days_between_maintanance = next_maintanance_datetime - maintanance_start_datetime
                 # Если интервал задан в часах, то переписываем значения
                 if interval_type == 'hrs':
-                    next_maintanance_datetime = maintanance_start_datetime + timedelta(hours=standard_interval_motohours) + timedelta(hours=plan_downtime)
+                    next_maintanance_datetime = maintanance_start_datetime + timedelta(
+                        hours=standard_interval_motohours) + timedelta(hours=plan_downtime)
                     days_between_maintanance = next_maintanance_datetime - maintanance_start_datetime
 
                 temp_dict['days_between_maintanance'] = days_between_maintanance
@@ -337,7 +342,8 @@ def maintanance_jobs_df_prepare():
                 remaining_hours = maintanance_interval_temp - number_of_days_to_next_maint * avearage_day_operation_hours
                 # календарный интервал между формами = кол-во суток х 24 + остаток
                 calendar_interval_between_maint = number_of_days_to_next_maint * 24 + remaining_hours
-                maintanance_start_datetime = base_start_maintanance_datetime + timedelta(hours=calendar_interval_between_maint) + timedelta(hours=plan_downtime)
+                maintanance_start_datetime = base_start_maintanance_datetime + timedelta(
+                    hours=calendar_interval_between_maint) + timedelta(hours=plan_downtime)
                 maintanance_finish_datetime = maintanance_start_datetime + timedelta(hours=plan_downtime)
                 temp_dict = {}
                 temp_dict['maintanance_job_code'] = maintanance_job_code
@@ -353,7 +359,8 @@ def maintanance_jobs_df_prepare():
                 temp_dict['maint_interval'] = maintanance_interval_temp
                 temp_dict['pass_interval_list'] = pass_interval
                 temp_dict['go_interval_list'] = go_interval
-                next_maintanance_datetime = maintanance_start_datetime + timedelta(hours=calendar_interval_between_maint) + timedelta(hours=plan_downtime)
+                next_maintanance_datetime = maintanance_start_datetime + timedelta(
+                    hours=calendar_interval_between_maint) + timedelta(hours=plan_downtime)
                 days_between_maintanance = next_maintanance_datetime - maintanance_start_datetime
                 temp_dict['days_between_maintanance'] = days_between_maintanance
                 temp_dict['next_maintanance_datetime'] = next_maintanance_datetime
@@ -398,8 +405,9 @@ def maintanance_jobs_df_prepare():
     maintanance_jobs_df['teh_mesto_month_year'] = maintanance_jobs_df['level_upper'] + '_' + maintanance_jobs_df[
         'month_year']
 
-    maintanance_jobs_df['maintanance_jobs_id'] = maintanance_jobs_df['eo_code'].astype(str) + "_" + maintanance_jobs_df['maintanance_category_id'].astype(str) + "_" + maintanance_jobs_df['maintanance_start_datetime'].astype(str)
-
+    maintanance_jobs_df['maintanance_jobs_id'] = maintanance_jobs_df['eo_code'].astype(str) + "_" + maintanance_jobs_df[
+        'maintanance_category_id'].astype(str) + "_" + maintanance_jobs_df['maintanance_start_datetime'].astype(str)
+    maintanance_jobs_df.sort_values(by=['maintanance_start_datetime'], ignore_index = True, inplace=True)
 
     maintanance_jobs_df.to_csv('data/maintanance_jobs_df.csv', index=False)
 
@@ -480,29 +488,19 @@ def hour_calculation():
     model_hours_df = pd.DataFrame(result_df_list)
 
     # print("model_hours_df info: ", model_hours_df.info())
-    model_hours_df.to_csv('data/model_hours_df_delete.csv')
+    # model_hours_df.to_csv('data/model_hours_df_delete.csv')
 
     # ПРОСТОИ. Нужно итерировать по таблице с простоями. Получать из нее ЕО момент начала ремонта и величину простоя
     # определить момент окончания. Затем отрезать мастер таблицу по этому периоду и поместить в поле простоя единички
     maintanance_jobs_df = maintanance_jobs_df_prepare()
     maintanance_jobs_df_selected = maintanance_jobs_df.loc[:,
-                                   ['maintanance_jobs_id', 'eo_code', 'maintanance_name', 'maintanance_start_datetime','maintanance_finish_datetime', 'downtime_plan']]
+                                   ['maintanance_jobs_id', 'eo_code', 'maintanance_name', 'maintanance_start_datetime',
+                                    'maintanance_finish_datetime', 'downtime_plan']]
 
 
-    ############ ОГРАНИЧИМСЯ ОДНОЙ МАШИНОЙ 100000084492
-    maintanance_jobs_df_selected = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected['eo_code'] == '100000084492']
-    maintanance_jobs_df_selected.to_csv('data/maintanance_jobs_df_selected_delete.csv', index = False)
-
-
-    ######### ТРЕНИРУЕМСЯ НА ОДНОЙ РАБОТЕ
-
-    # maintanance_jobs_df_selected = maintanance_jobs_df_selected.iloc[[0]]
-
-    maintanance_jobs_df_selected = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected["maintanance_jobs_id"] == '100000084492_tr_2023-02-08 05:36:00']
-
+    # maintanance_jobs_df_selected = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected["maintanance_jobs_id"] == '100000084492_tr_2023-02-08 05:36:00']
 
     for row in maintanance_jobs_df_selected.itertuples():
-
         maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
         # print(maintanance_jobs_id)
         eo_code = getattr(row, "eo_code")
@@ -513,8 +511,9 @@ def hour_calculation():
 
         # print("maintanance_start_datetime", maintanance_start_datetime)
         # print("maintanance_finish_datetime", maintanance_finish_datetime)
-        model_hours_df_cut_by_maint_job = model_hours_df.loc[(model_hours_df['model_hour'] >= maintanance_start_datetime) &
-                                                             (model_hours_df['model_hour'] <= maintanance_finish_datetime)]
+        model_hours_df_cut_by_maint_job = model_hours_df.loc[
+            (model_hours_df['model_hour'] >= maintanance_start_datetime) &
+            (model_hours_df['model_hour'] <= maintanance_finish_datetime)]
 
         # print(model_hours_df_cut_by_maint_job)
         ## indexes - список индексов записей в которых надо поставить единичку, то есть в этих записях есть простой
@@ -525,9 +524,8 @@ def hour_calculation():
         ##### Записываем единичку в основную таблицу
         model_hours_df.loc[indexes, ['downtime_status']] = 1
 
-
         # print(model_hours_df_cut_by_maint_job)
-    model_hours_df.to_csv('data/model_hours_df_temp_delete.csv')
+    model_hours_df.to_csv('data/model_hours_df_temp_delete.csv', index=False)
 
 
 hour_calculation()
@@ -545,7 +543,6 @@ def ktg_by_month_models():
     maintanance_jobs__for_zero_dowtime_groupped = maintanance_jobs__for_zero_dowtime.groupby(
         ['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)[
         'downtime_plan'].sum()
-
 
 ################# ЗАПУСК ФУНКЦИЙ #############################
 
@@ -565,6 +562,6 @@ def ktg_by_month_models():
 # eo_job_catologue()
 
 
-maintanance_jobs_df_prepare()
+# maintanance_jobs_df_prepare()
 
 # fill_calendar_fond()
