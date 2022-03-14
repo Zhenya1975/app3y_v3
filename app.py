@@ -182,7 +182,6 @@ def maintanance(theme_selector, btn_update_n_click):
 def funct(n_clicks_ktg_table):
   # df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str)
   df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str, decimal=",")
-  df['eo_code'] = df['ЕО'].astype(str)
   # df['Среднесуточная наработка'].apply(lambda x: x.replace(',','.'))
   # df['Среднесуточная наработка'] = df['Среднесуточная наработка'].astype(float)
   if n_clicks_ktg_table:
