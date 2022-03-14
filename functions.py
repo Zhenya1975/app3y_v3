@@ -442,118 +442,120 @@ def fill_calendar_fond():
 
 ###################### РАСЧЕТ КАЛЕНДАРНОГО ФОНДА И ПРОСТОЕВ ПО ЧАСАМ НА ТРИ ГОДА ######################
 def hour_calculation():
-    """РАСЧЕТ КАЛЕНДАРНОГО ФОНДА И ПРОСТОЕВ ПО ЧАСАМ НА ТРИ ГОДА"""
-    # необходимо получить дефолтную таблицу с нулями
-    # Для этого берем начальную точку в нуле часов 1 января 2023 года, прибавляем час и записываем новую строку
-    start_point = pd.to_datetime('01.01.2023', format='%d.%m.%Y')
+  """РАСЧЕТ КАЛЕНДАРНОГО ФОНДА И ПРОСТОЕВ ПО ЧАСАМ НА ТРИ ГОДА"""
+  # необходимо получить дефолтную таблицу с нулями
+  # Для этого берем начальную точку в нуле часов 1 января 2023 года, прибавляем час и записываем новую строку
+  start_point = pd.to_datetime('01.01.2023', format='%d.%m.%Y')
 
-    # Список ЕО для почасовой модели
-    full_eo_list = full_eo_list_func()
-    # full_eo_list.to_csv('data/full_eo_list_delete.csv')
-    full_eo_list = full_eo_list.loc[:, ['eo_code', 'operation_start_date', 'operation_finish_date']]
+  # Список ЕО для почасовой модели
+  full_eo_list = full_eo_list_func()
+  # full_eo_list.to_csv('data/full_eo_list_delete.csv')
+  full_eo_list = full_eo_list.loc[:, ['eo_code', 'operation_start_date', 'operation_finish_date']]
 
-    ###################  ОГРАНИЧИМСЯ ДЛЯ ТЕСТИРОВАНИЯ ОДНОЙ МАШИНОЙ И ОДНИМ ГОДОМ #################
-    eo_list = full_eo_list.loc[full_eo_list['eo_code'] == '100000084492']
-    # eo_list.to_csv('data/eo_list_delete.csv')
-    # operation_finish_date = pd.to_datetime('31.12.2023', format='%d.%m.%Y')
-    # eo_list = full_eo_list
-    # print(eo_list)
-    # eo_list = full_eo_list.loc[:, ['eo_code', 'operation_start_date', 'operation_finish_date']]
+  ###################  ОГРАНИЧИМСЯ ДЛЯ ТЕСТИРОВАНИЯ ОДНОЙ МАШИНОЙ И ОДНИМ ГОДОМ #################
+  eo_list = full_eo_list.loc[full_eo_list['eo_code'] == '100000084492']
+  # eo_list.to_csv('data/eo_list_delete.csv')
+  # operation_finish_date = pd.to_datetime('31.12.2023', format='%d.%m.%Y')
+  # eo_list = full_eo_list
+  # print(eo_list)
+  # eo_list = full_eo_list.loc[:, ['eo_code', 'operation_start_date', 'operation_finish_date']]
 
-    result_df_list = []
-    for row in eo_list.itertuples():
-        temp_dict = {}
-        eo_code = getattr(row, "eo_code")
-        operation_start_date = getattr(row, "operation_start_date")
-        operation_finish_date = getattr(row, "operation_finish_date")
-        current_hour = start_point
-        
-        while current_hour < last_day_of_selection:
-            temp_dict['eo_code'] = eo_code
-            temp_dict['model_hour'] = current_hour
-            temp_dict['year'] = current_hour.year
-            temp_dict['month'] = current_hour.month
-            temp_dict['month_year'] = str(current_hour.month) + "_" + str(current_hour.year)
-            
-
-            ################ если текущее значение часа внутри времени эксплуатации машины, то ставим единичку в календарный фонд времени #################
-            if current_hour > operation_start_date and current_hour < operation_finish_date:
-                temp_dict['calendar_fond_status'] = 1
-            else:
-                temp_dict['calendar_fond_status'] = 0
-
-            temp_dict['downtime_status'] = 0
-
-            result_df_list.append(temp_dict)
-            current_hour = current_hour + timedelta(hours=1)
-            temp_dict = {}
-
-    model_hours_df = pd.DataFrame(result_df_list)
-
-    # print("model_hours_df info: ", model_hours_df.info())
-    # model_hours_df.to_csv('data/model_hours_df_delete.csv')
-
-    # ПРОСТОИ. Нужно итерировать по таблице с простоями. Получать из нее ЕО момент начала ремонта и величину простоя
-    # определить момент окончания. Затем отрезать мастер таблицу по этому периоду и поместить в поле простоя единички
-    maintanance_jobs_df = maintanance_jobs_df_prepare()
-    maintanance_jobs_df_selected = maintanance_jobs_df.loc[:,
-                                   ['maintanance_jobs_id', 'eo_code','maintanance_category_id', 'maintanance_name', 'maintanance_start_datetime', 'maintanance_finish_datetime', 'downtime_plan']]
-    maintanance_jobs_df_selected.to_csv('data/maintanance_jobs_df_selected_delete.csv', index = False)
-
-    # maintanance_jobs_df_selected = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected["maintanance_jobs_id"] == '100000084492_tr_2023-02-08 05:36:00']
-
-    for row in maintanance_jobs_df_selected.itertuples():
-      maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
-      # print(maintanance_jobs_id)
+  result_df_list = []
+  for row in eo_list.itertuples():
+      temp_dict = {}
       eo_code = getattr(row, "eo_code")
-      maintanance_name = getattr(row, "maintanance_name")
-      maintanance_category_id = getattr(row, "maintanance_category_id")
+      operation_start_date = getattr(row, "operation_start_date")
+      operation_finish_date = getattr(row, "operation_finish_date")
+      current_hour = start_point
       
-      maintanance_start_datetime = getattr(row, "maintanance_start_datetime")
-      maintanance_finish_datetime = getattr(row, "maintanance_finish_datetime")
-      downtime_plan = getattr(row, "downtime_plan")
-  
-      # print("maintanance_start_datetime", maintanance_start_datetime)
-      # print("maintanance_finish_datetime", maintanance_finish_datetime)
-      # Режем таблицу с почасовыми строками по моменту старта и завершения работы
-      model_hours_df_cut_by_maint_job = model_hours_df.loc[
-            (model_hours_df['model_hour'] >= maintanance_start_datetime) &
-            (model_hours_df['model_hour'] <= maintanance_finish_datetime)]
-  
-      # print(model_hours_df_cut_by_maint_job)
-      # indexes - список индексов записей в которых надо поставить единичку, то есть в этих записях есть простой
-      indexes = model_hours_df_cut_by_maint_job.index.values
-  
-      model_hours_df_cut_by_maint_job = model_hours_df_cut_by_maint_job.copy()
-      model_hours_df.loc[indexes, ['maintanance_jobs_id']] = maintanance_jobs_id
-      ##### Записываем единичку в основную таблицу
-      model_hours_df.loc[indexes, ['downtime_status']] = 1
-  
-      # print(model_hours_df_cut_by_maint_job)
-    model_hours_df.to_csv('data/model_3y_hours_df.csv', index=False)
-  
-    # Готовим таблицу для КТГ
-    # maintanance_jobs__for_zero_dowtime.groupby(['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)['dowtime_plan, hours'].sum()
-    model_hours_ktg_data = model_hours_df.groupby(['month_year'], as_index = False)[['calendar_fond_status', 'downtime_status']].sum()
-    model_hours_ktg_data['ktg'] = (model_hours_ktg_data['calendar_fond_status'] - model_hours_ktg_data['downtime_status']) / model_hours_ktg_data['calendar_fond_status']
-    
-    model_hours_ktg_data['ktg'] = model_hours_ktg_data['ktg'].apply(lambda x: round(x, 2))
-    period_dict = initial_values.period_dict
-    
-    period_sort_index = initial_values.period_sort_index
-  
-    model_hours_ktg_data['period'] = model_hours_ktg_data['month_year'].map(period_dict).astype(str)
+      while current_hour < last_day_of_selection:
+          temp_dict['eo_code'] = eo_code
+          temp_dict['model_hour'] = current_hour
+          temp_dict['year'] = current_hour.year
+          temp_dict['month'] = current_hour.month
+          temp_dict['month_year'] = str(current_hour.month) + "_" + str(current_hour.year)
+          
 
-    model_hours_ktg_data['period_sort_index'] = model_hours_ktg_data['month_year'].map(period_sort_index)
-    model_hours_ktg_data.sort_values(by='period_sort_index', inplace = True)
-    
-    ktg_table_data = model_hours_ktg_data.loc[:, ['period', 'calendar_fond_status', 'downtime_status', 'ktg']]
-    ktg_table_data = ktg_table_data.rename(columns={'period': 'Период', 'calendar_fond_status': 'Календарный фонд, час', 'downtime_status': 'Запланированный простой, час', 'ktg': 'Запланированный КТГ'})
-    		
-  
-    ktg_table_data.to_csv('data/model_hours_ktg_data.csv', index = False)
-    
+          ################ если текущее значение часа внутри времени эксплуатации машины, то ставим единичку в календарный фонд времени #################
+          if current_hour > operation_start_date and current_hour < operation_finish_date:
+              temp_dict['calendar_fond_status'] = 1
+          else:
+              temp_dict['calendar_fond_status'] = 0
 
+          temp_dict['downtime_status'] = 0
+
+          result_df_list.append(temp_dict)
+          current_hour = current_hour + timedelta(hours=1)
+          temp_dict = {}
+
+  model_hours_df = pd.DataFrame(result_df_list)
+
+  # print("model_hours_df info: ", model_hours_df.info())
+  # model_hours_df.to_csv('data/model_hours_df_delete.csv')
+
+  # ПРОСТОИ. Нужно итерировать по таблице с простоями. Получать из нее ЕО момент начала ремонта и величину простоя
+  # определить момент окончания. Затем отрезать мастер таблицу по этому периоду и поместить в поле простоя единички
+  maintanance_jobs_df = maintanance_jobs_df_prepare()
+  maintanance_jobs_df_selected = maintanance_jobs_df.loc[:,
+                                 ['maintanance_jobs_id', 'eo_code','maintanance_category_id', 'maintanance_name', 'maintanance_start_datetime', 'maintanance_finish_datetime', 'downtime_plan']]
+  maintanance_jobs_df_selected.to_csv('data/maintanance_jobs_df_selected_delete.csv', index = False)
+
+  # maintanance_jobs_df_selected = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected["maintanance_jobs_id"] == '100000084492_tr_2023-02-08 05:36:00']
+
+  for row in maintanance_jobs_df_selected.itertuples():
+    maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
+    # print(maintanance_jobs_id)
+    eo_code = getattr(row, "eo_code")
+    maintanance_name = getattr(row, "maintanance_name")
+    maintanance_category_id = getattr(row, "maintanance_category_id")
+    
+    maintanance_start_datetime = getattr(row, "maintanance_start_datetime")
+    maintanance_finish_datetime = getattr(row, "maintanance_finish_datetime")
+    downtime_plan = getattr(row, "downtime_plan")
+
+    # print("maintanance_start_datetime", maintanance_start_datetime)
+    # print("maintanance_finish_datetime", maintanance_finish_datetime)
+    # Режем таблицу с почасовыми строками по моменту старта и завершения работы
+    model_hours_df_cut_by_maint_job = model_hours_df.loc[
+          (model_hours_df['model_hour'] >= maintanance_start_datetime) &
+          (model_hours_df['model_hour'] <= maintanance_finish_datetime)]
+
+    # print(model_hours_df_cut_by_maint_job)
+    # indexes - список индексов записей в которых надо поставить единичку, то есть в этих записях есть простой
+    indexes = model_hours_df_cut_by_maint_job.index.values
+
+    model_hours_df_cut_by_maint_job = model_hours_df_cut_by_maint_job.copy()
+    model_hours_df.loc[indexes, ['maintanance_jobs_id']] = maintanance_jobs_id
+    ##### Записываем единичку в основную таблицу
+    model_hours_df.loc[indexes, ['downtime_status']] = 1
+
+    # print(model_hours_df_cut_by_maint_job)
+  model_hours_df.to_csv('data/model_3y_hours_df.csv', index=False)
+
+  # Готовим таблицу для КТГ
+  # maintanance_jobs__for_zero_dowtime.groupby(['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)['dowtime_plan, hours'].sum()
+  model_hours_ktg_data = model_hours_df.groupby(['month_year'], as_index = False)[['calendar_fond_status', 'downtime_status']].sum()
+  model_hours_ktg_data['ktg'] = (model_hours_ktg_data['calendar_fond_status'] - model_hours_ktg_data['downtime_status']) / model_hours_ktg_data['calendar_fond_status']
+  
+  model_hours_ktg_data['ktg'] = model_hours_ktg_data['ktg'].apply(lambda x: round(x, 2))
+  period_dict = initial_values.period_dict
+  
+  period_sort_index = initial_values.period_sort_index
+
+  model_hours_ktg_data['period'] = model_hours_ktg_data['month_year'].map(period_dict).astype(str)
+
+  model_hours_ktg_data['period_sort_index'] = model_hours_ktg_data['month_year'].map(period_sort_index)
+  model_hours_ktg_data.sort_values(by='period_sort_index', inplace = True)
+  
+  ktg_table_data = model_hours_ktg_data.loc[:, ['period', 'calendar_fond_status', 'downtime_status', 'ktg']]
+  ktg_table_data = ktg_table_data.rename(columns={'period': 'Период', 'calendar_fond_status': 'Календарный фонд, час', 'downtime_status': 'Запланированный простой, час', 'ktg': 'Запланированный КТГ'})
+
+  ktg_table_data.to_csv('data/model_hours_ktg_data.csv', index = False)
+
+  downtime_graph_data = ktg_table_data.loc[:, ['Период','Запланированный простой, час']]
+  downtime_graph_data.to_csv('widget_data/downtime_graph_data.csv', index = False)
+
+  
 hour_calculation()
 
 

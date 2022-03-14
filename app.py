@@ -154,9 +154,9 @@ def maintanance(theme_selector, btn_update_n_click):
     
     print("нажали кнопку")
     # Обновление данных для построения графика
-    widget_fig_downtime.fig_downtime_by_years_data(maintanance_jobs_df)
-  
-  fig_downtime = widget_fig_downtime.fig_downtime_by_years(maintanance_jobs_df, theme_selector)
+    widget_fig_downtime.fig_downtime_by_years_data()
+
+  fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector)
 
 
   df_ktg_table = pd.read_csv('data/model_hours_ktg_data.csv')

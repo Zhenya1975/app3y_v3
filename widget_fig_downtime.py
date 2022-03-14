@@ -31,31 +31,16 @@ load_figure_template(templates)
 dbc_css = (
     "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates@V1.0.1/dbc.min.css"
 )
-
-def fig_downtime_by_years_data(maintanance_jobs_df):
-  maintanance_jobs_df = maintanance_jobs_df.loc[:, ["dowtime_plan, hours", "month_year", "month_year_sort_index"]]
-  # print(maintanance_jobs_df.info())
-  maintanance_jobs_df_groupped = maintanance_jobs_df.groupby(["month_year", "month_year_sort_index"], as_index=False)["dowtime_plan, hours"].sum()
-  # print(maintanance_jobs_df_groupped)
-  # x_month_year = ['1_2023','2_2023','3_2023','4_2023','5_2023','6_2023','7_2023','8_2023','9_2023','10_2023','11_2023','12_2023','1_2024','2_2024','3_2024','4_2024','5_2024','6_2024','7_2024','8_2024','9_2024','10_2024','11_2024','12_2024','1_2025','2_2025','3_2025','4_2025','5_2025','6_2025','7_2025','8_2025','9_2025','10_2025','11_2025','12_2025']
-  x_month_year = maintanance_jobs_df_groupped['month_year']
-  y_downtime = maintanance_jobs_df_groupped['dowtime_plan, hours']
-  text_list_downtime_month_year = maintanance_jobs_df_groupped['dowtime_plan, hours']
-  maintanance_jobs_df_groupped.sort_values(by=['month_year_sort_index'],inplace = True)
-  maintanance_jobs_df_groupped.to_csv("widget_data/fig_downtime_by_years_data.csv", index = False)
-
  
-
 ################# График простоев по месяцам за три года ###############################
-def fig_downtime_by_years(maintanance_jobs_df, theme_selector):
+def fig_downtime_by_years(theme_selector):
     
   '''График простоев по месяцам за три года'''
-  fig_downtime_data = pd.read_csv("widget_data/fig_downtime_by_years_data.csv")
-  x_month_year =fig_downtime_data['month_year']
-  y_downtime = fig_downtime_data['dowtime_plan, hours']
-  text_list_downtime_month_year = fig_downtime_data['dowtime_plan, hours']
-  #downtime_y = maintanance_jobs_df['dowtime_plan, hours']
-  #dates_x = maintanance_jobs_df['maintanance_datetime']
+  downtime_graph_data_df = pd.read_csv('widget_data/downtime_graph_data.csv')
+  x_month_year = downtime_graph_data_df['Период']
+  y_downtime = downtime_graph_data_df['Запланированный простой, час']
+  text_list_downtime_month_year = downtime_graph_data_df['Запланированный простой, час']
+ 
   if theme_selector:
       graph_template = 'seaborn'
   # bootstrap
