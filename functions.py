@@ -536,8 +536,22 @@ def hour_calculation():
     # maintanance_jobs__for_zero_dowtime.groupby(['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)['dowtime_plan, hours'].sum()
     model_hours_ktg_data = model_hours_df.groupby(['month_year'], as_index = False)[['calendar_fond_status', 'downtime_status']].sum()
     model_hours_ktg_data['ktg'] = (model_hours_ktg_data['calendar_fond_status'] - model_hours_ktg_data['downtime_status']) / model_hours_ktg_data['calendar_fond_status']
+    
+    model_hours_ktg_data['ktg'] = model_hours_ktg_data['ktg'].apply(lambda x: round(x, 2))
+    period_dict = initial_values.period_dict
+    
+    period_sort_index = initial_values.period_sort_index
   
-    model_hours_ktg_data.to_csv('data/model_hours_ktg_data.csv', index = False)
+    model_hours_ktg_data['period'] = model_hours_ktg_data['month_year'].map(period_dict).astype(str)
+
+    model_hours_ktg_data['period_sort_index'] = model_hours_ktg_data['month_year'].map(period_sort_index)
+    model_hours_ktg_data.sort_values(by='period_sort_index', inplace = True)
+    
+    ktg_table_data = model_hours_ktg_data.loc[:, ['period', 'calendar_fond_status', 'downtime_status', 'ktg']]
+    ktg_table_data = ktg_table_data.rename(columns={'period': 'Период', 'calendar_fond_status': 'Календарный фонд, час', 'downtime_status': 'Запланированный простой, час', 'ktg': 'Запланированный КТГ'})
+    		
+  
+    ktg_table_data.to_csv('data/model_hours_ktg_data.csv', index = False)
     
 
 hour_calculation()
