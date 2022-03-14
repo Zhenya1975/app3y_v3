@@ -512,6 +512,7 @@ def hour_calculation():
     maintanance_start_datetime = getattr(row, "maintanance_start_datetime")
     maintanance_finish_datetime = getattr(row, "maintanance_finish_datetime")
     downtime_plan = getattr(row, "downtime_plan")
+    maintanance_name = getattr(row, "maintanance_name")
 
 
     # Режем таблицу с почасовыми строками по моменту старта и завершения работы
@@ -525,6 +526,7 @@ def hour_calculation():
 
     model_hours_df_cut_by_maint_job = model_hours_df_cut_by_maint_job.copy()
     model_hours_df.loc[indexes, ['maintanance_jobs_id']] = maintanance_jobs_id
+    model_hours_df.loc[indexes, ['maintanance_name']] = maintanance_name
     ##### Записываем единичку в основную таблицу
     model_hours_df.loc[indexes, ['downtime_status']] = 1
 
@@ -557,21 +559,10 @@ def hour_calculation():
   ktg_graph_data = ktg_table_data.loc[:, ['Период','Запланированный КТГ']]
   ktg_graph_data.to_csv('widget_data/ktg_graph_data.csv', index = False)
 
+  return model_hours_df
 
 
 
-def ktg_by_month_models():
-    maintanance_jobs_df = maintanance_jobs_df_prepare()
-    eo_calendar_fond = fill_calendar_fond()
-    year = 2023
-
-    maintanance_jobs__for_zero_dowtime = maintanance_jobs_df.loc[:,
-                                         ['teh_mesto_month_year', 'level_upper', 'Название технического места',
-                                          'month_year', 'year']]
-    maintanance_jobs__for_zero_dowtime['downtime_plan'] = 0
-    maintanance_jobs__for_zero_dowtime_groupped = maintanance_jobs__for_zero_dowtime.groupby(
-        ['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)[
-        'downtime_plan'].sum()
 
 def total_qty_EO():
   """расчет количества машин в выборке для отображения в карточке 2023 года"""
@@ -600,15 +591,11 @@ def eo_list_download_preparation():
   # выбираем колонки
   eo_list_data = eo_list_data.loc[:, ['level_1_description','eo_class_description','constr_type','teh_mesto',	'mvz','eo_model_name', 'eo_code',	 'eo_description',  'operation_start_date', 'operation_finish_date', 'avearage_day_operation_hours_updated', 'Наработка 1.03.2022']]
   # eo_list_data['eo_code'] = eo_list_data['eo_code'].astype(str)
-
-
   # переименовываем колонки
   eo_download_data = eo_list_data.rename(columns=initial_values.rename_columns_dict)
-
-
   eo_download_data.to_csv('widget_data/eo_download_data.csv', index = False)
 
-eo_list_download_preparation()
+
 
 
 def maint_jobs_download_preparation():
@@ -621,7 +608,6 @@ def maint_jobs_download_preparation():
   full_eo_list = full_eo_list.loc[:, ['eo_code','level_1_description', 'eo_class_description', 'constr_type', 'teh_mesto', 'mvz', 'eo_description', 'operation_start_date', 'operation_finish_date', 'avearage_day_operation_hours_updated', 'Наработка 1.03.2022']]
   # джойним с full_eo_list
   
-  
   maint_jobs_data = pd.merge(maintanance_jobs_dataframe, full_eo_list, on = 'eo_code', how ='left')
   maint_jobs_data['downtime_plan'] = maint_jobs_data['downtime_plan'].astype(str)
   maint_jobs_data['downtime_plan'] = maint_jobs_data['downtime_plan'].str.replace('.', ',', regex=False)
@@ -633,9 +619,38 @@ def maint_jobs_download_preparation():
   
   maint_jobs_data_for_excel.to_csv('widget_data/maint_jobs_download_data.csv', index = False)
 
-maint_jobs_download_preparation()
 
+def downtime_by_categiries_2023_data():
+  """подготовка csv файла для построения пайчарта простоев по категориям в 2023, 2024, 2025 году"""
+  # Читаем model_hours_ktg_data()
+  model_hours_df = hour_calculation()
+  ############# 2023 год ###################
+  model_hours_df_2023 = model_hours_df.loc[model_hours_df['year'] == 2023] 
+  model_hours_df_2023 = model_hours_df.loc[model_hours_df['downtime_status'] == 1] 
 
+  model_hours_df_2023_groupped = model_hours_df_2023.groupby(['maintanance_name'], as_index=False)[['downtime_status']].sum()
+  downtime_by_catagories_2023_data = model_hours_df_2023_groupped.rename(columns={'maintanance_name': 'Вид ТОРО', 'downtime_status': 'Простой, час'})
+  downtime_by_catagories_2023_data.to_csv('widget_data/downtime_by_categiries_2023_data.csv', index = False)
+
+  ############# 2024 год ###################
+  model_hours_df_2024 = model_hours_df.loc[model_hours_df['year'] == 2024] 
+  model_hours_df_2024 = model_hours_df.loc[model_hours_df['downtime_status'] == 1] 
+
+  model_hours_df_2024_groupped = model_hours_df_2024.groupby(['maintanance_name'], as_index=False)[['downtime_status']].sum()
+  downtime_by_catagories_2024_data = model_hours_df_2024_groupped.rename(columns={'maintanance_name': 'Вид ТОРО', 'downtime_status': 'Простой, час'})
+  downtime_by_catagories_2024_data.to_csv('widget_data/downtime_by_categiries_2024_data.csv', index = False)
+
+  ############# 2025 год ###################
+  model_hours_df_2025 = model_hours_df.loc[model_hours_df['year'] == 2025] 
+  model_hours_df_2025 = model_hours_df.loc[model_hours_df['downtime_status'] == 1] 
+
+  model_hours_df_2025_groupped = model_hours_df_2025.groupby(['maintanance_name'], as_index=False)[['downtime_status']].sum()
+  downtime_by_catagories_2025_data = model_hours_df_2025_groupped.rename(columns={'maintanance_name': 'Вид ТОРО', 'downtime_status': 'Простой, час'})
+  downtime_by_catagories_2025_data.to_csv('widget_data/downtime_by_categiries_2025_data.csv', index = False)
+
+  return downtime_by_catagories_2023_data, downtime_by_catagories_2024_data, downtime_by_catagories_2025_data
+  
+downtime_by_categiries_2023_data()
 
 ################# ЗАПУСК ФУНКЦИЙ #############################
 
@@ -656,8 +671,8 @@ maint_jobs_download_preparation()
 # eo_job_catologue()
 
 
-maintanance_jobs_df_prepare()
+# maintanance_jobs_df_prepare()
 # maintanance_jobs_df()
 # fill_calendar_fond()
 
-hour_calculation()
+# hour_calculation()

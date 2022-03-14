@@ -10,6 +10,7 @@ import tab_main
 import functions
 import widget_fig_downtime
 import widget_fig_ktg
+import widget_fig_piechart_downtime_2023
 import ktg_table_html
 # import tab_coverage
 # import tab_settings
@@ -132,7 +133,8 @@ app.layout = dbc.Container(
     Output('eo_qty_2025', 'children'),
     Output('planned_downtime', 'figure'),
     Output('fig_ktg_3y_by_months_id', 'figure'),
-  
+    Output('planned_downtime_piechart_2023', 'figure'),
+
     Output('ktg_by_month_table', 'children'),
     Output('loading', 'parent_style'),
 
@@ -157,15 +159,22 @@ def maintanance(theme_selector, btn_update_n_click):
   maintanance_jobs_df = functions.maintanance_jobs_df()
   # при нажатии на кнопку обновляем csv для построения графиков
   if btn_update_n_click:
-    
-    print("нажали кнопку")
     # Обновление данных для построения графика
-    widget_fig_downtime.fig_downtime_by_years_data()
+    functions.pass_interval_fill()
+    functions.maintanance_category_prep()
+    functions.eo_job_catologue()
+    functions.maintanance_jobs_df_prepare()
+    functions.fill_calendar_fond()
+    functions.hour_calculation()
+    functions.eo_list_download_preparation()
+    functions.maint_jobs_download_preparation()
+    functions.downtime_by_categiries_2023_data()
 
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector)
 
   fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector)
-  
+
+  fig_piechart_downtime_2023 = widget_fig_piechart_downtime_2023.fig_piechart_downtime_2023(theme_selector)
   
   total_qty_EO_2023 = functions.total_qty_EO()[0]
   total_qty_EO_2024 = functions.total_qty_EO()[1]
@@ -179,7 +188,7 @@ def maintanance(theme_selector, btn_update_n_click):
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
   new_loading_style = loading_style
-  return eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, ktg_by_month_table, new_loading_style
+  return eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, ktg_by_month_table, new_loading_style
 
 
 

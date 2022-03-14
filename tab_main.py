@@ -212,36 +212,15 @@ def maintanance_chart_tab():
                            dbc.Col(width=4,
                             children=[
                               html.P(),
-                              dcc.Graph(id='planned_downtime_piechart', config={'displayModeBar': False}),
+                              dcc.Graph(id='planned_downtime_piechart_2023', config={'displayModeBar': False}),
                             ])
                         ])
                       ),
                        
                        html.Hr(),
                        html.P(),
-                       dcc.Graph(id='ktg_by_years', config={'displayModeBar': False}),
-                       html.Hr(),
-                       html.Div(
-                        dbc.Row([
                       
-                          dbc.Col(width=12,
-                            children=[
-                              html.Div([
-                                html.P(),
-                                
-                                html.P(),
-                                dbc.Button("Выгрузить ктг.xlsx", id="btn_download_ktg_table", size="sm",
-                                           style={'marginBottom': '3px',
-                                                  'marginTop': '3px',
-                                                  'backgroundColor': '#232632'}, ),
-                                dcc.Download(id="download_ktg_table")
-                        ]),
-                              
-                            ]),
-                         
-                       ]),
-                      # style={"background-color": "#ABBAEA"},
-                      ),
+                       
                        html.Div(id='ktg_by_month_table'), 
 
 
