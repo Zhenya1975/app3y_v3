@@ -213,7 +213,17 @@ def maintanance_chart_tab():
                             children=[
                               html.P(),
                               dcc.Graph(id='planned_downtime_piechart_2023', config={'displayModeBar': False}),
-                            ])
+                            ]),
+                          dbc.Col(width=4,
+                            children=[
+                              html.P(),
+                              dcc.Graph(id='planned_downtime_piechart_2024', config={'displayModeBar': False}),
+                            ]),
+                          dbc.Col(width=4,
+                            children=[
+                              html.P(),
+                              dcc.Graph(id='planned_downtime_piechart_2025', config={'displayModeBar': False}),
+                            ]),
                         ])
                       ),
                        
