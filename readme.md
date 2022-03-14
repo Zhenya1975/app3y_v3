@@ -22,4 +22,5 @@ eo_job_catologue()
 maintanance_jobs_df_prepare()
 fill_calendar_fond()
 hour_calculation()
-eo_list_download_preparation
+eo_list_download_preparation()
+maint_jobs_download_preparation()

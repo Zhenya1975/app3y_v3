@@ -168,11 +168,11 @@ def maintanance_chart_tab():
                           dbc.Col(width=2,
                                   children=[
                                     html.Div([
-                                      dbc.Button("Выгрузить простои в выборке xlsx", id="btn_download_downtime_table", size="sm",
+                                      dbc.Button("Выгрузить ТОИР воздействия, xlsx", id="btn_download_maint_jobs_table", size="sm",
                                                  style={'marginBottom': '3px',
                                                         'marginTop': '3px',
                                                         'backgroundColor': '#232632'},),
-                                      dcc.Download(id="download_excel_downtime_table")
+                                      dcc.Download(id="download_excel_maint_jobs_table")
                                     ])
                                   ]
                                  )

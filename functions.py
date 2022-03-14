@@ -6,7 +6,7 @@ first_day_of_selection = initial_values.first_day_of_selection
 last_day_of_selection = initial_values.last_day_of_selection
 
 
-# print(timedelta(hours=50.0))
+
 
 def full_eo_list_actual_func():
     """чтение full_eo_list_actual"""
@@ -48,7 +48,7 @@ def maintanance_jobs_df():
 
 def maintanance_job_list_general_func():
     """чтение maintanance_job_list_general"""
-    maintanance_job_list_general = pd.read_csv('data/maintanance_job_list_general.csv')
+    maintanance_job_list_general = pd.read_csv('data/maintanance_job_list_general.csv', decimal=",")
     maintanance_job_list_general = maintanance_job_list_general.astype({'downtime_planned': float, 'strategy_id': int})
     return maintanance_job_list_general
 
@@ -141,7 +141,7 @@ def maintanance_category_prep():
 def select_eo_for_calculation():
     """Выборка ео из полного списка full_eo_list_actual в full_eo_list"""
     full_eo_list_actual_df = full_eo_list_actual_func()
-    # print(full_eo_list_actual_df)
+
     strategy_list_df = pd.read_csv('data/strategy_list.csv')
     strategy_list = strategy_list_df['strategy_id'].unique()
     eo_list_for_calculation = full_eo_list_actual_df.loc[full_eo_list_actual_df['strategy_id'].isin(strategy_list)]
@@ -241,7 +241,7 @@ def maintanance_jobs_df_prepare():
     maintanance_jobs_result_list = []
 
     for row in eo_maint_plan.itertuples():
-        # print(row)
+ 
         maintanance_job_code = getattr(row, "eo_maintanance_job_code")
         eo_code = getattr(row, "eo_code")
         standard_interval_motohours = float(getattr(row, "interval_motohours"))
@@ -298,7 +298,7 @@ def maintanance_jobs_df_prepare():
                 temp_dict['maintanance_start_datetime'] = maintanance_start_datetime
                 maintanance_finish_datetime = maintanance_start_datetime + timedelta(hours=plan_downtime)
                 temp_dict['maintanance_finish_datetime'] = maintanance_finish_datetime
-                temp_dict['maintanance_date'] = maintanance_start_datetime.date()
+                temp_dict['maintanance_start_date'] = maintanance_start_datetime.date()
                 temp_dict['maintanance_category_id'] = maintanance_category_id
                 temp_dict['maintanance_name'] = maintanance_name
                 # количество суток, которые требуются для того, чтобы выработать интервал до следующей формы
@@ -457,7 +457,7 @@ def hour_calculation():
   # eo_list.to_csv('data/eo_list_delete.csv')
   # operation_finish_date = pd.to_datetime('31.12.2023', format='%d.%m.%Y')
   # eo_list = full_eo_list
-  # print(eo_list)
+
   # eo_list = full_eo_list.loc[:, ['eo_code', 'operation_start_date', 'operation_finish_date']]
 
   result_df_list = []
@@ -490,8 +490,8 @@ def hour_calculation():
 
   model_hours_df = pd.DataFrame(result_df_list)
 
-  # print("model_hours_df info: ", model_hours_df.info())
-  # model_hours_df.to_csv('data/model_hours_df_delete.csv')
+
+
 
   # ПРОСТОИ. Нужно итерировать по таблице с простоями. Получать из нее ЕО момент начала ремонта и величину простоя
   # определить момент окончания. Затем отрезать мастер таблицу по этому периоду и поместить в поле простоя единички
@@ -504,7 +504,7 @@ def hour_calculation():
 
   for row in maintanance_jobs_df_selected.itertuples():
     maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
-    # print(maintanance_jobs_id)
+
     eo_code = getattr(row, "eo_code")
     maintanance_name = getattr(row, "maintanance_name")
     maintanance_category_id = getattr(row, "maintanance_category_id")
@@ -513,14 +513,13 @@ def hour_calculation():
     maintanance_finish_datetime = getattr(row, "maintanance_finish_datetime")
     downtime_plan = getattr(row, "downtime_plan")
 
-    # print("maintanance_start_datetime", maintanance_start_datetime)
-    # print("maintanance_finish_datetime", maintanance_finish_datetime)
+
     # Режем таблицу с почасовыми строками по моменту старта и завершения работы
     model_hours_df_cut_by_maint_job = model_hours_df.loc[
           (model_hours_df['model_hour'] >= maintanance_start_datetime) &
           (model_hours_df['model_hour'] <= maintanance_finish_datetime)]
 
-    # print(model_hours_df_cut_by_maint_job)
+
     # indexes - список индексов записей в которых надо поставить единичку, то есть в этих записях есть простой
     indexes = model_hours_df_cut_by_maint_job.index.values
 
@@ -529,7 +528,7 @@ def hour_calculation():
     ##### Записываем единичку в основную таблицу
     model_hours_df.loc[indexes, ['downtime_status']] = 1
 
-    # print(model_hours_df_cut_by_maint_job)
+
   model_hours_df.to_csv('data/model_3y_hours_df.csv', index=False)
 
   # Готовим таблицу для КТГ
@@ -597,19 +596,44 @@ def eo_list_download_preparation():
 
   # выбираем колонки
   eo_list_data = eo_list_data.loc[:, ['level_1_description','eo_class_description','constr_type','teh_mesto',	'mvz','eo_model_name', 'eo_code',	 'eo_description',  'operation_start_date', 'operation_finish_date', 'avearage_day_operation_hours_updated', 'Наработка 1.03.2022']]
-  eo_list_data['eo_code'] = eo_list_data['eo_code'].astype(str)
-  print(eo_list_data['avearage_day_operation_hours_updated'])
+  # eo_list_data['eo_code'] = eo_list_data['eo_code'].astype(str)
+
 
   # переименовываем колонки
-  eo_download_data = eo_list_data.rename(columns={'level_1_description':"БЕ", 'eo_class_description':"Класс ЕО", "constr_type": "Тип конструкции", "teh_mesto": "Техместо",'mvz':"МВЗ", "eo_model_name": "Модель ЕО", "eo_code": "ЕО", "eo_description": "Наименоваание ЕО", "operation_start_date":"Дата начала эксплуатации", "operation_finish_date": "Дата завершения эксплуатации", "avearage_day_operation_hours_updated": "Среднесуточная наработка"})
+  eo_download_data = eo_list_data.rename(columns=initial_values.rename_columns_dict)
 
 
-  
   eo_download_data.to_csv('widget_data/eo_download_data.csv', index = False)
 
 eo_list_download_preparation()
 
-# total_qty_EO_2023()
+
+def maint_jobs_download_preparation():
+  """подготовка csv файла для выгрузки в эксель данных о работах, которые вошли в отчет"""
+  # Читаем maintanance_jobs_df()
+  maintanance_jobs_dataframe = maintanance_jobs_df()
+   
+  # извлекаем список ЕО
+  full_eo_list = full_eo_list_func()
+  full_eo_list = full_eo_list.loc[:, ['eo_code','level_1_description', 'eo_class_description', 'constr_type', 'teh_mesto', 'mvz', 'eo_description', 'operation_start_date', 'operation_finish_date', 'avearage_day_operation_hours_updated', 'Наработка 1.03.2022']]
+  # джойним с full_eo_list
+  
+  
+  maint_jobs_data = pd.merge(maintanance_jobs_dataframe, full_eo_list, on = 'eo_code', how ='left')
+  maint_jobs_data['downtime_plan'] = maint_jobs_data['downtime_plan'].astype(str)
+  maint_jobs_data['downtime_plan'] = maint_jobs_data['downtime_plan'].str.replace('.', ',', regex=False)
+ 
+   # выбираем колонки
+  maint_jobs_data = maint_jobs_data.loc[:, ['level_1_description','eo_class_description','constr_type','teh_mesto',	'mvz','eo_model_name', 'eo_code',	 'eo_description',  'operation_start_date', 'operation_finish_date', 'avearage_day_operation_hours_updated', 'Наработка 1.03.2022', 'maintanance_start_datetime','maintanance_finish_datetime', 'maintanance_name', 'downtime_plan']]
+  # переименовываем колонки
+  maint_jobs_data_for_excel = maint_jobs_data.rename(columns= initial_values.rename_columns_dict)
+  
+  maint_jobs_data_for_excel.to_csv('widget_data/maint_jobs_download_data.csv', index = False)
+
+maint_jobs_download_preparation()
+
+
+
 ################# ЗАПУСК ФУНКЦИЙ #############################
 
 
@@ -629,7 +653,7 @@ eo_list_download_preparation()
 # eo_job_catologue()
 
 
-# maintanance_jobs_df_prepare()
+maintanance_jobs_df_prepare()
 # maintanance_jobs_df()
 # fill_calendar_fond()
 

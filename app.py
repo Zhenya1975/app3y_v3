@@ -179,14 +179,26 @@ def maintanance(theme_selector, btn_update_n_click):
     Output("download_excel_eo_table", "data"),
     Input("btn_download_eo_table", "n_clicks"),
     prevent_initial_call=True,)
-def funct(n_clicks_ktg_table):
+def funct(n_clicks_eo_table):
   # df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str)
   df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str, decimal=",")
   # df['Среднесуточная наработка'].apply(lambda x: x.replace(',','.'))
   # df['Среднесуточная наработка'] = df['Среднесуточная наработка'].astype(float)
-  if n_clicks_ktg_table:
+  if n_clicks_eo_table:
     return dcc.send_data_frame(df.to_excel, "EO в выборке КТГ.xlsx", index=False, sheet_name="EO в выборке КТГ")
 
+
+####################### ОБРАБОТЧИК ВЫГРУЗКИ РАБОТ В EXCEL #####################################
+@app.callback(
+    Output("download_excel_maint_jobs_table", "data"),
+    Input("btn_download_maint_jobs_table", "n_clicks"),
+    prevent_initial_call=True,)
+def funct_maint_jobs_table(n_clicks_maint_jobs_table):
+  # df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str)
+  df = pd.read_csv('widget_data/maint_jobs_download_data.csv', dtype = str, decimal=",")
+
+  if n_clicks_maint_jobs_table:
+    return dcc.send_data_frame(df.to_excel, "ТОИР воздействия.xlsx", index=False, sheet_name="ТОИР воздействия")
 
 
 if __name__ == "__main__":
