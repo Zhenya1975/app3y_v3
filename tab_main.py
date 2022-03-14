@@ -106,9 +106,43 @@ def maintanance_chart_tab():
                  
                               ),
                               dbc.Col(width = 4,
+                                      children = [
+                                  dbc.Card(
+                                    dbc.CardBody(
+                                        [
+                                            html.H4("2024 год", className="card-title"),
+                                            #html.H6("Card subtitle", className="card-subtitle"),
+                                            html.P(id = 'eo_qty_2024'),
+                                            html.P(id = 'ktg_2024'),
+
+                                           
+                                        ]
+                                    ),
+                                    style={"width": "18rem"},
+
+                                  )
+
+                                ],
                               
                               ),
                               dbc.Col(width = 4,
+                                      children = [
+                                  dbc.Card(
+                                    dbc.CardBody(
+                                        [
+                                            html.H4("2025 год", className="card-title"),
+                                            #html.H6("Card subtitle", className="card-subtitle"),
+                                            html.P(id = 'eo_qty_2025'),
+                                            html.P(id = 'ktg_2025'),
+
+                                           
+                                        ]
+                                    ),
+                                    style={"width": "18rem"},
+
+                                  )
+
+                                ],
                               
                               )
                         ]),

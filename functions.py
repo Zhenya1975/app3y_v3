@@ -571,15 +571,18 @@ def ktg_by_month_models():
         ['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)[
         'downtime_plan'].sum()
 
-def total_qty_EO_2023():
+def total_qty_EO():
   """расчет количества машин в выборке для отображения в карточке 2023 года"""
   # Читаем maintanance_jobs_df()
   maintanance_jobs_dataframe = maintanance_jobs_df()
-  maintanance_jobs_dataframe = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['year'] == 2023]
-  
+  maintanance_jobs_dataframe_2023 = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['year'] == 2023]
+  maintanance_jobs_dataframe_2024 = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['year'] == 2024]
+  maintanance_jobs_dataframe_2025 = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['year'] == 2025]
   # Считаем кол-во записей в колонке eo_code
-  eo_qty = len(maintanance_jobs_dataframe['eo_code'].unique())
-  return eo_qty
+  eo_qty_2023 = len(maintanance_jobs_dataframe_2023['eo_code'].unique())
+  eo_qty_2024 = len(maintanance_jobs_dataframe_2024['eo_code'].unique())
+  eo_qty_2025 = len(maintanance_jobs_dataframe_2025['eo_code'].unique())
+  return eo_qty_2023, eo_qty_2024, eo_qty_2025
 
 # total_qty_EO_2023()
 ################# ЗАПУСК ФУНКЦИЙ #############################

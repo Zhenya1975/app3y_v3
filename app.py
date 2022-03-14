@@ -127,6 +127,8 @@ app.layout = dbc.Container(
 ######################### ОСНОВНОЙ ОБРАБОТЧИК ДЛЯ ПОСТРОЕНИЯ ГРАФИКОВ ##############################
 @app.callback([
     Output('eo_qty_2023', 'children'),
+    Output('eo_qty_2024', 'children'),
+    Output('eo_qty_2025', 'children'),
     Output('planned_downtime', 'figure'),
     Output('ktg_by_month_table', 'children'),
     Output('loading', 'parent_style'),
@@ -158,14 +160,19 @@ def maintanance(theme_selector, btn_update_n_click):
     widget_fig_downtime.fig_downtime_by_years_data()
 
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector)
-  total_qty_EO_2023 = functions.total_qty_EO_2023()
+  total_qty_EO_2023 = functions.total_qty_EO()[0]
+  total_qty_EO_2024 = functions.total_qty_EO()[1]
+  total_qty_EO_2025 = functions.total_qty_EO()[2]
+  
   eo_qty_2023_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2023)
+  eo_qty_2024_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2024)
+  eo_qty_2025_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2025)
   
   df_ktg_table = pd.read_csv('data/model_hours_ktg_data.csv')
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
   new_loading_style = loading_style
-  return eo_qty_2023_card_text, fig_downtime, ktg_by_month_table, new_loading_style
+  return eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, ktg_by_month_table, new_loading_style
 
 
 if __name__ == "__main__":
