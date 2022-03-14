@@ -35,18 +35,13 @@ def maintanance_chart_tab():
                   ]),
 
 
-                    html.P(),
-                    html.Div([
-                      "Техместо вышестоящее",
-                      dcc.Dropdown(id="checklist_main_eo_class", multi=True),
-                  ]),
                     
                   
-                  html.P(),
-                    html.Div([
-                      "ЕО",
-                      dcc.Dropdown(id="checklist_eo", multi=True, optionHeight = 50),
-                  ]),
+                  # html.P(),
+                  #   html.Div([
+                  #     "ЕО",
+                  #     dcc.Dropdown(id="checklist_eo", multi=True, optionHeight = 50),
+                  # ]),
                     html.Hr(),
                     html.P('Категории работ'),
                     html.Div(style={'marginLeft': '3px'},
@@ -97,8 +92,8 @@ def maintanance_chart_tab():
                                         [
                                             html.H4("2023 год", className="card-title"),
                                             #html.H6("Card subtitle", className="card-subtitle"),
-                                            html.P(id = 'downtime_2023'),
-                                            html.P(id = 'cal_fond_2023'),
+                                            html.P(id = 'eo_qty_2023'),
+                                            html.P(id = 'ktg_2023'),
 
                                            
                                         ]

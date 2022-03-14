@@ -41,7 +41,7 @@ def last_maint_date_func():
 def maintanance_jobs_df():
     """чтение maintanance_jobs_df"""
     maintanance_jobs_df = pd.read_csv('data/maintanance_jobs_df.csv', dtype=str)
-    maintanance_jobs_df = maintanance_jobs_df.astype({'downtime_plan': float, "month_year_sort_index": int})
+    maintanance_jobs_df = maintanance_jobs_df.astype({'downtime_plan': float, "month_year_sort_index": int, "year":int, "month":int, "day": int, "hour":int})
 
     return maintanance_jobs_df
 
@@ -555,8 +555,7 @@ def hour_calculation():
   downtime_graph_data = ktg_table_data.loc[:, ['Период','Запланированный простой, час']]
   downtime_graph_data.to_csv('widget_data/downtime_graph_data.csv', index = False)
 
-  
-hour_calculation()
+
 
 
 def ktg_by_month_models():
@@ -572,6 +571,17 @@ def ktg_by_month_models():
         ['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)[
         'downtime_plan'].sum()
 
+def total_qty_EO_2023():
+  """расчет количества машин в выборке для отображения в карточке 2023 года"""
+  # Читаем maintanance_jobs_df()
+  maintanance_jobs_dataframe = maintanance_jobs_df()
+  maintanance_jobs_dataframe = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['year'] == 2023]
+  
+  # Считаем кол-во записей в колонке eo_code
+  eo_qty = len(maintanance_jobs_dataframe['eo_code'].unique())
+  return eo_qty
+
+# total_qty_EO_2023()
 ################# ЗАПУСК ФУНКЦИЙ #############################
 
 
@@ -594,3 +604,5 @@ def ktg_by_month_models():
 # maintanance_jobs_df_prepare()
 # maintanance_jobs_df()
 # fill_calendar_fond()
+
+# hour_calculation()

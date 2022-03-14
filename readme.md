@@ -13,3 +13,6 @@ functions.select_eo_for_calculation() """Выборка ео из полного
 functions.eo_job_catologue():'''создание файла eo_job_catologue: список оборудование - работа на оборудовании'''
 
 functions.maintanance_jobs_df_prepare()''' подготовка файла со списком работ - основной файл для построения графика простоев'''
+
+
+По кнопке обновить:
