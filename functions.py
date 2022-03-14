@@ -41,7 +41,7 @@ def last_maint_date_func():
 def maintanance_jobs_df():
     """чтение maintanance_jobs_df"""
     maintanance_jobs_df = pd.read_csv('data/maintanance_jobs_df.csv', dtype=str)
-    maintanance_jobs_df = maintanance_jobs_df.astype({'dowtime_plan, hours': float, "month_year_sort_index": int})
+    maintanance_jobs_df = maintanance_jobs_df.astype({'downtime_plan': float, "month_year_sort_index": int})
 
     return maintanance_jobs_df
 
@@ -368,7 +368,7 @@ def maintanance_jobs_df_prepare():
                     maintanance_jobs_result_list.append(temp_dict)
 
     maintanance_jobs_df = pd.DataFrame(maintanance_jobs_result_list)
-    maintanance_jobs_df.to_csv('data/maintanance_jobs_df_full_list_delete.csv')
+    # maintanance_jobs_df.to_csv('data/maintanance_jobs_df_full_list_delete.csv')
 
     # режем то, что получилось в период три года
     maintanance_jobs_df = maintanance_jobs_df.loc[
@@ -467,11 +467,14 @@ def hour_calculation():
         operation_start_date = getattr(row, "operation_start_date")
         operation_finish_date = getattr(row, "operation_finish_date")
         current_hour = start_point
-
+        
         while current_hour < last_day_of_selection:
-
             temp_dict['eo_code'] = eo_code
             temp_dict['model_hour'] = current_hour
+            temp_dict['year'] = current_hour.year
+            temp_dict['month'] = current_hour.month
+            temp_dict['month_year'] = str(current_hour.month) + "_" + str(current_hour.year)
+            
 
             ################ если текущее значение часа внутри времени эксплуатации машины, то ставим единичку в календарный фонд времени #################
             if current_hour > operation_start_date and current_hour < operation_finish_date:
@@ -494,39 +497,48 @@ def hour_calculation():
     # определить момент окончания. Затем отрезать мастер таблицу по этому периоду и поместить в поле простоя единички
     maintanance_jobs_df = maintanance_jobs_df_prepare()
     maintanance_jobs_df_selected = maintanance_jobs_df.loc[:,
-                                   ['maintanance_jobs_id', 'eo_code', 'maintanance_name', 'maintanance_start_datetime',
-                                    'maintanance_finish_datetime', 'downtime_plan']]
-
+                                   ['maintanance_jobs_id', 'eo_code','maintanance_category_id', 'maintanance_name', 'maintanance_start_datetime', 'maintanance_finish_datetime', 'downtime_plan']]
+    maintanance_jobs_df_selected.to_csv('data/maintanance_jobs_df_selected_delete.csv', index = False)
 
     # maintanance_jobs_df_selected = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected["maintanance_jobs_id"] == '100000084492_tr_2023-02-08 05:36:00']
 
     for row in maintanance_jobs_df_selected.itertuples():
-        maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
-        # print(maintanance_jobs_id)
-        eo_code = getattr(row, "eo_code")
-        maintanance_name = getattr(row, "maintanance_name")
-        maintanance_start_datetime = getattr(row, "maintanance_start_datetime")
-        maintanance_finish_datetime = getattr(row, "maintanance_finish_datetime")
-        downtime_plan = getattr(row, "downtime_plan")
-
-        # print("maintanance_start_datetime", maintanance_start_datetime)
-        # print("maintanance_finish_datetime", maintanance_finish_datetime)
-        model_hours_df_cut_by_maint_job = model_hours_df.loc[
+      maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
+      # print(maintanance_jobs_id)
+      eo_code = getattr(row, "eo_code")
+      maintanance_name = getattr(row, "maintanance_name")
+      maintanance_category_id = getattr(row, "maintanance_category_id")
+      
+      maintanance_start_datetime = getattr(row, "maintanance_start_datetime")
+      maintanance_finish_datetime = getattr(row, "maintanance_finish_datetime")
+      downtime_plan = getattr(row, "downtime_plan")
+  
+      # print("maintanance_start_datetime", maintanance_start_datetime)
+      # print("maintanance_finish_datetime", maintanance_finish_datetime)
+      # Режем таблицу с почасовыми строками по моменту старта и завершения работы
+      model_hours_df_cut_by_maint_job = model_hours_df.loc[
             (model_hours_df['model_hour'] >= maintanance_start_datetime) &
             (model_hours_df['model_hour'] <= maintanance_finish_datetime)]
-
-        # print(model_hours_df_cut_by_maint_job)
-        ## indexes - список индексов записей в которых надо поставить единичку, то есть в этих записях есть простой
-        indexes = model_hours_df_cut_by_maint_job.index.values
-
-        model_hours_df_cut_by_maint_job = model_hours_df_cut_by_maint_job.copy()
-        model_hours_df.loc[indexes, ['maintanance_jobs_id']] = maintanance_jobs_id
-        ##### Записываем единичку в основную таблицу
-        model_hours_df.loc[indexes, ['downtime_status']] = 1
-
-        # print(model_hours_df_cut_by_maint_job)
-    model_hours_df.to_csv('data/model_hours_df_temp_delete.csv', index=False)
-
+  
+      # print(model_hours_df_cut_by_maint_job)
+      # indexes - список индексов записей в которых надо поставить единичку, то есть в этих записях есть простой
+      indexes = model_hours_df_cut_by_maint_job.index.values
+  
+      model_hours_df_cut_by_maint_job = model_hours_df_cut_by_maint_job.copy()
+      model_hours_df.loc[indexes, ['maintanance_jobs_id']] = maintanance_jobs_id
+      ##### Записываем единичку в основную таблицу
+      model_hours_df.loc[indexes, ['downtime_status']] = 1
+  
+      # print(model_hours_df_cut_by_maint_job)
+    model_hours_df.to_csv('data/model_3y_hours_df.csv', index=False)
+  
+    # Готовим таблицу для КТГ
+    # maintanance_jobs__for_zero_dowtime.groupby(['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)['dowtime_plan, hours'].sum()
+    model_hours_ktg_data = model_hours_df.groupby(['month_year'], as_index = False)[['calendar_fond_status', 'downtime_status']].sum()
+    model_hours_ktg_data['ktg'] = (model_hours_ktg_data['calendar_fond_status'] - model_hours_ktg_data['downtime_status']) / model_hours_ktg_data['calendar_fond_status']
+  
+    model_hours_ktg_data.to_csv('data/model_hours_ktg_data.csv', index = False)
+    
 
 hour_calculation()
 
@@ -553,6 +565,7 @@ def ktg_by_month_models():
 # last_maint_date_func()
 # functions.pass_interval_fill() '''создание списка pass interval в maintanance_job_list_general'''
 # pass_interval_fill()
+  
 
 # functions.maintanance_category_prep() """Создание файла со списком категорий работ ТОИР"""
 # maintanance_category_prep()
@@ -563,5 +576,5 @@ def ktg_by_month_models():
 
 
 # maintanance_jobs_df_prepare()
-
+# maintanance_jobs_df()
 # fill_calendar_fond()

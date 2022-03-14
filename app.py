@@ -159,7 +159,7 @@ def maintanance(theme_selector, btn_update_n_click):
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(maintanance_jobs_df, theme_selector)
 
 
-
+  df_ktg_table = pd.read_csv('data/model_hours_ktg_data.csv')
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
   new_loading_style = loading_style
