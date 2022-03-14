@@ -84,7 +84,8 @@ def maintanance_chart_tab():
                                 
                           )
                         ]),
-                        dbc.Row([
+                        dbc.Row(justify="start",
+                          children = [
                               dbc.Col(width = 4,
                                 children = [
                                   dbc.Card(
@@ -145,16 +146,29 @@ def maintanance_chart_tab():
                                 ],
                               
                               )
-                        ]),
+                        ],
+                          
+                               ),
                       html.Hr(),
                       ###################### ряд с кнопками выгрузки таблиц в эксель ####################
                       html.Div(
                         dbc.Row([
+                          dbc.Col(width=2,
+                                  children=[
+                                    html.Div([
+                                      dbc.Button("Выгрузить ЕО в выборке xlsx", id="btn_download_eo_table", size="sm",
+                                                 style={'marginBottom': '3px',
+                                                        'marginTop': '3px',
+                                                        'backgroundColor': '#232632'},),
+                                      dcc.Download(id="download_excel_eo_table")
+                                    ])
+                                  ]
+                                 ),
                       
                           dbc.Col(width=2,
                                   children=[
                                     html.Div([
-                                      dbc.Button("Выгрузить простои xlsx", id="btn_download_downtime_table", size="sm",
+                                      dbc.Button("Выгрузить простои в выборке xlsx", id="btn_download_downtime_table", size="sm",
                                                  style={'marginBottom': '3px',
                                                         'marginTop': '3px',
                                                         'backgroundColor': '#232632'},),

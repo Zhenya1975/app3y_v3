@@ -174,6 +174,21 @@ def maintanance(theme_selector, btn_update_n_click):
   new_loading_style = loading_style
   return eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, ktg_by_month_table, new_loading_style
 
+####################### ОБРАБОТЧИК ВЫГРУЗКИ ЕО В EXCEL #####################################
+@app.callback(
+    Output("download_excel_eo_table", "data"),
+    Input("btn_download_eo_table", "n_clicks"),
+    prevent_initial_call=True,)
+def funct(n_clicks_ktg_table):
+  # df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str)
+  df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str, decimal=",")
+  df['eo_code'] = df['ЕО'].astype(str)
+  # df['Среднесуточная наработка'].apply(lambda x: x.replace(',','.'))
+  # df['Среднесуточная наработка'] = df['Среднесуточная наработка'].astype(float)
+  if n_clicks_ktg_table:
+    return dcc.send_data_frame(df.to_excel, "EO в выборке КТГ.xlsx", index=False, sheet_name="EO в выборке КТГ")
+
+
 
 if __name__ == "__main__":
     # app.run_server(debug=True)

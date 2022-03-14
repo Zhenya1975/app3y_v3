@@ -584,6 +584,31 @@ def total_qty_EO():
   eo_qty_2025 = len(maintanance_jobs_dataframe_2025['eo_code'].unique())
   return eo_qty_2023, eo_qty_2024, eo_qty_2025
 
+
+def eo_list_download_preparation():
+  """подготовка csv файла для выгрузки в эксель данных о машинах в выборке"""
+  # Читаем maintanance_jobs_df()
+  maintanance_jobs_dataframe = maintanance_jobs_df()
+  # извлекаем список ЕО
+  eo_list = pd.DataFrame(list(set(maintanance_jobs_dataframe['eo_code'])), columns=['eo_code'])
+  # джойним с full_eo_list 
+  full_eo_list = full_eo_list_func()
+  eo_list_data = pd.merge(eo_list, full_eo_list, on = 'eo_code', how ='left')
+
+  # выбираем колонки
+  eo_list_data = eo_list_data.loc[:, ['level_1_description','eo_class_description','constr_type','teh_mesto',	'mvz','eo_model_name', 'eo_code',	 'eo_description',  'operation_start_date', 'operation_finish_date', 'avearage_day_operation_hours_updated', 'Наработка 1.03.2022']]
+  eo_list_data['eo_code'] = eo_list_data['eo_code'].astype(str)
+  print(eo_list_data['avearage_day_operation_hours_updated'])
+
+  # переименовываем колонки
+  eo_download_data = eo_list_data.rename(columns={'level_1_description':"БЕ", 'eo_class_description':"Класс ЕО", "constr_type": "Тип конструкции", "teh_mesto": "Техместо",'mvz':"МВЗ", "eo_model_name": "Модель ЕО", "eo_code": "ЕО", "eo_description": "Наименоваание ЕО", "operation_start_date":"Дата начала эксплуатации", "operation_finish_date": "Дата завершения эксплуатации", "avearage_day_operation_hours_updated": "Среднесуточная наработка"})
+
+
+  
+  eo_download_data.to_csv('widget_data/eo_download_data.csv', index = False)
+
+eo_list_download_preparation()
+
 # total_qty_EO_2023()
 ################# ЗАПУСК ФУНКЦИЙ #############################
 

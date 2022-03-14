@@ -16,3 +16,10 @@ functions.maintanance_jobs_df_prepare()''' подготовка файла со 
 
 
 По кнопке обновить:
+functions.pass_interval_fill()
+maintanance_category_prep()
+eo_job_catologue()
+maintanance_jobs_df_prepare()
+fill_calendar_fond()
+hour_calculation()
+eo_list_download_preparation
