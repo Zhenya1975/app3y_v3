@@ -183,16 +183,12 @@ def maintanance_chart_tab():
                       html.Div(
                         dbc.Row([
                       
-                          dbc.Col(width=8,
+                          dbc.Col(width=12,
                             children=[
                               html.P(),
                               dcc.Graph(id='planned_downtime', config={'displayModeBar': False}),
                             ]),
-                         dbc.Col(width=4,
-                            children=[
-                              html.P(),
-                              dcc.Graph(id='planned_downtime_piechart', config={'displayModeBar': False}),
-                            ])
+                        
                        ]),
                       # style={"background-color": "#ABBAEA"},
                       ), 
@@ -200,7 +196,7 @@ def maintanance_chart_tab():
                       html.Div(
                         dbc.Row([
                       
-                          dbc.Col(width=8,
+                          dbc.Col(width=12,
                             children=[
                               html.P(),
                               dcc.Graph(id='fig_ktg_3y_by_months_id', config={'displayModeBar': False}),
@@ -210,9 +206,16 @@ def maintanance_chart_tab():
                       # style={"background-color": "#ABBAEA"},
                       ), 
 
-
-
                       #############################################################
+                      html.Div(
+                        dbc.Row([
+                           dbc.Col(width=4,
+                            children=[
+                              html.P(),
+                              dcc.Graph(id='planned_downtime_piechart', config={'displayModeBar': False}),
+                            ])
+                        ])
+                      ),
                        
                        html.Hr(),
                        html.P(),

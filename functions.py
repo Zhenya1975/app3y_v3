@@ -554,6 +554,9 @@ def hour_calculation():
   downtime_graph_data = ktg_table_data.loc[:, ['Период','Запланированный простой, час']]
   downtime_graph_data.to_csv('widget_data/downtime_graph_data.csv', index = False)
 
+  ktg_graph_data = ktg_table_data.loc[:, ['Период','Запланированный КТГ']]
+  ktg_graph_data.to_csv('widget_data/ktg_graph_data.csv', index = False)
+
 
 
 
@@ -657,4 +660,4 @@ maintanance_jobs_df_prepare()
 # maintanance_jobs_df()
 # fill_calendar_fond()
 
-# hour_calculation()
+hour_calculation()
