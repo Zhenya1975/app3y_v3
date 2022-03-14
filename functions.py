@@ -220,7 +220,7 @@ def maintanance_jobs_df_prepare():
     # eo_job_catologue_df = eo_job_catologue_df.loc[eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_47'])]
     # eo_job_catologue_df = eo_job_catologue_df.loc[eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_37'])]
     eo_job_catologue_df = eo_job_catologue_df.loc[
-        eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_47', '100000084492_37'])]
+        eo_job_catologue_df['eo_maintanance_job_code'].isin(['100000084492_47', '100000084492_37','100000084492_36'])]
     full_eo_list = full_eo_list_func()
 
     # выдергиваем из full_eo_list 'eo_code', 'avearage_day_operation_hours'
@@ -500,8 +500,36 @@ def hour_calculation():
                                  ['maintanance_jobs_id', 'eo_code','maintanance_category_id', 'maintanance_name', 'maintanance_start_datetime', 'maintanance_finish_datetime', 'downtime_plan']]
   maintanance_jobs_df_selected.to_csv('data/maintanance_jobs_df_selected_delete.csv', index = False)
 
-  # maintanance_jobs_df_selected = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected["maintanance_jobs_id"] == '100000084492_tr_2023-02-08 05:36:00']
+  # Первым проходом заполняем ячейки значениями ето.
+  maintanance_jobs_df_selected_eto = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected['maintanance_category_id'] =='eto']
 
+  for row in maintanance_jobs_df_selected_eto.itertuples():
+    maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
+    eo_code = getattr(row, "eo_code")
+    maintanance_name = getattr(row, "maintanance_name")
+    maintanance_category_id = getattr(row, "maintanance_category_id")
+    maintanance_start_datetime = getattr(row, "maintanance_start_datetime")
+    maintanance_finish_datetime = getattr(row, "maintanance_finish_datetime")
+    downtime_plan = getattr(row, "downtime_plan")
+    maintanance_name = getattr(row, "maintanance_name")
+
+    # Режем таблицу с почасовыми строками по моменту старта и завершения работы
+    model_hours_df_cut_by_maint_job = model_hours_df.loc[
+          (model_hours_df['model_hour'] >= maintanance_start_datetime) &
+          (model_hours_df['model_hour'] <= maintanance_finish_datetime)]
+    # indexes - список индексов записей в которых надо поставить единичку, то есть в этих записях есть простой
+    indexes = model_hours_df_cut_by_maint_job.index.values
+
+    model_hours_df_cut_by_maint_job = model_hours_df_cut_by_maint_job.copy()
+    model_hours_df.loc[indexes, ['maintanance_jobs_id']] = maintanance_jobs_id
+    model_hours_df.loc[indexes, ['maintanance_name']] = maintanance_name
+    ##### Записываем единичку в основную таблицу
+    model_hours_df.loc[indexes, ['downtime_status']] = downtime_plan
+
+  model_hours_df.to_csv('data/model_hours_df_check_eto_delete.csv')
+
+  #  После этого следующим проходом заполним нормальными ТО-шками
+  maintanance_jobs_df_selected = maintanance_jobs_df_selected.loc[maintanance_jobs_df_selected['maintanance_category_id'] !='eto']
   for row in maintanance_jobs_df_selected.itertuples():
     maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
 
@@ -563,7 +591,6 @@ def hour_calculation():
 
 
 
-
 def total_qty_EO():
   """расчет количества машин в выборке для отображения в карточке 2023 года"""
   # Читаем maintanance_jobs_df()
@@ -620,7 +647,7 @@ def maint_jobs_download_preparation():
   maint_jobs_data_for_excel.to_csv('widget_data/maint_jobs_download_data.csv', index = False)
 
 
-def downtime_by_categiries_2023_data():
+def downtime_by_categiries_data():
   """подготовка csv файла для построения пайчарта простоев по категориям в 2023, 2024, 2025 году"""
   # Читаем model_hours_ktg_data()
   model_hours_df = hour_calculation()
@@ -650,7 +677,7 @@ def downtime_by_categiries_2023_data():
 
   return downtime_by_catagories_2023_data, downtime_by_catagories_2024_data, downtime_by_catagories_2025_data
   
-downtime_by_categiries_2023_data()
+
 
 ################# ЗАПУСК ФУНКЦИЙ #############################
 
