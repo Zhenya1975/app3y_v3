@@ -450,9 +450,9 @@ def hour_calculation():
   # Список ЕО для почасовой модели
   full_eo_list = full_eo_list_func()
   # full_eo_list.to_csv('data/full_eo_list_delete.csv')
-  full_eo_list = full_eo_list.loc[:, ['eo_code', 'operation_start_date', 'operation_finish_date']]
+  full_eo_list = full_eo_list.loc[:, ['level_1_description', 'eo_model_name', 'eo_code', 'operation_start_date', 'operation_finish_date']]
 
-  ###################  ОГРАНИЧИМСЯ ДЛЯ ТЕСТИРОВАНИЯ ОДНОЙ МАШИНОЙ И ОДНИМ ГОДОМ #################
+  ###################  ОГРАНИЧИМСЯ ДЛЯ ТЕСТИРОВАНИЯ ОДНОЙ МАШИНОЙ #################
   eo_list = full_eo_list.loc[full_eo_list['eo_code'] == '100000084492']
   # eo_list.to_csv('data/eo_list_delete.csv')
   # operation_finish_date = pd.to_datetime('31.12.2023', format='%d.%m.%Y')
@@ -463,12 +463,16 @@ def hour_calculation():
   result_df_list = []
   for row in eo_list.itertuples():
       temp_dict = {}
+      be = getattr(row, "level_1_description")
+      eo_model_name = getattr(row, "eo_model_name")
       eo_code = getattr(row, "eo_code")
       operation_start_date = getattr(row, "operation_start_date")
       operation_finish_date = getattr(row, "operation_finish_date")
       current_hour = start_point
       
       while current_hour < last_day_of_selection:
+          temp_dict['be'] = be
+          temp_dict['eo_model_name'] = eo_model_name
           temp_dict['eo_code'] = eo_code
           temp_dict['model_hour'] = current_hour
           temp_dict['year'] = current_hour.year
@@ -489,8 +493,6 @@ def hour_calculation():
           temp_dict = {}
 
   model_hours_df = pd.DataFrame(result_df_list)
-
-
 
 
   # ПРОСТОИ. Нужно итерировать по таблице с простоями. Получать из нее ЕО момент начала ремонта и величину простоя
@@ -557,39 +559,97 @@ def hour_calculation():
     model_hours_df.loc[indexes, ['maintanance_name']] = maintanance_name
     ##### Записываем единичку в основную таблицу
     model_hours_df.loc[indexes, ['downtime_status']] = 1
-
-
-  model_hours_df.to_csv('data/model_3y_hours_df.csv', index=False)
-
-  # Готовим таблицу для КТГ
-  # maintanance_jobs__for_zero_dowtime.groupby(['teh_mesto_month_year', 'level_upper', 'Название технического места', 'month_year', 'year'], as_index=False)['dowtime_plan, hours'].sum()
-  model_hours_ktg_data = model_hours_df.groupby(['month_year'], as_index = False)[['calendar_fond_status', 'downtime_status']].sum()
-  model_hours_ktg_data['ktg'] = (model_hours_ktg_data['calendar_fond_status'] - model_hours_ktg_data['downtime_status']) / model_hours_ktg_data['calendar_fond_status']
   
-  model_hours_ktg_data['ktg'] = model_hours_ktg_data['ktg'].apply(lambda x: round(x, 2))
   period_dict = initial_values.period_dict
   
   period_sort_index = initial_values.period_sort_index
 
-  model_hours_ktg_data['period'] = model_hours_ktg_data['month_year'].map(period_dict).astype(str)
+  model_hours_df['period'] = model_hours_df['month_year'].map(period_dict).astype(str)
 
-  model_hours_ktg_data['period_sort_index'] = model_hours_ktg_data['month_year'].map(period_sort_index)
-  model_hours_ktg_data.sort_values(by='period_sort_index', inplace = True)
+  model_hours_df['period_sort_index'] = model_hours_df['month_year'].map(period_sort_index)
+  model_hours_df.sort_values(by='period_sort_index', inplace = True)
+  model_hours_df.to_csv('data/model_3y_hours_df.csv', index=False)
   
-  ktg_table_data = model_hours_ktg_data.loc[:, ['period', 'calendar_fond_status', 'downtime_status', 'ktg']]
-  ktg_table_data = ktg_table_data.rename(columns={'period': 'Период', 'calendar_fond_status': 'Календарный фонд, час', 'downtime_status': 'Запланированный простой, час', 'ktg': 'Запланированный КТГ'})
 
-  ktg_table_data.to_csv('data/model_hours_ktg_data.csv', index = False)
+  downtime_graph_data = model_hours_df.loc[:, ['period','downtime_status', 'period_sort_index']]
+  downtime_graph_data.sort_values(by='period_sort_index', inplace = True)
 
-  downtime_graph_data = ktg_table_data.loc[:, ['Период','Запланированный простой, час']]
+  downtime_graph_data_groupped = downtime_graph_data.groupby(['period_sort_index', 'period'], as_index = False)[['downtime_status']].sum()
+  
+  
+  downtime_graph_data = downtime_graph_data_groupped.loc[:, ['period', 'downtime_status']]
+  downtime_graph_data = downtime_graph_data.rename(columns={'period': 'Период', 'downtime_status': 'Запланированный простой, час'})
+
   downtime_graph_data.to_csv('widget_data/downtime_graph_data.csv', index = False)
-
-  ktg_graph_data = ktg_table_data.loc[:, ['Период','Запланированный КТГ']]
-  ktg_graph_data.to_csv('widget_data/ktg_graph_data.csv', index = False)
-
+  
   return model_hours_df
 
+# hour_calculation()
 
+def ktg_graph_data_preparation():
+  """ПОДГОТОВКА ДАННЫХ ДЛЯ ПОСТРОЕНИЯ ГРАФИКА КТГ"""
+  # получаем исходную таблицу  model_hours_df Здесь потом будем забирать фильтра и резать по БЕ и моделям машин исходную таблицу
+  model_hours_df = hour_calculation()
+  # делаем группировку по month_year
+  model_hours_ktg_data = model_hours_df.groupby(['period_sort_index','month_year'], as_index = False)[['calendar_fond_status', 'downtime_status']].sum()
+  model_hours_ktg_data['ktg'] = (model_hours_ktg_data['calendar_fond_status'] - model_hours_ktg_data['downtime_status']) / model_hours_ktg_data['calendar_fond_status']
+  model_hours_ktg_data['ktg'] = model_hours_ktg_data['ktg'].apply(lambda x: round(x, 2))
+  
+  ktg_table_data = model_hours_ktg_data.loc[:, ['month_year', 'calendar_fond_status', 'downtime_status', 'ktg']]
+  ktg_table_data = ktg_table_data.rename(columns={'month_year': 'Период', 'calendar_fond_status': 'Календарный фонд, час', 'downtime_status': 'Запланированный простой, час', 'ktg': 'Запланированный КТГ'})
+  ktg_graph_data = ktg_table_data.loc[:, ['Период','Запланированный КТГ']]
+  
+  ktg_graph_data.to_csv('widget_data/ktg_graph_data.csv', index = False)
+  
+# ktg_graph_data_preparation()
+
+def ktg_table_prep():
+  """Подготовка таблицы ктг. В строках - модели ЕО, в столбцах месяцы"""
+  # Читаем таблицу с записямо работ по часам 
+  model_hours_df = pd.read_csv('data/model_3y_hours_df.csv')
+  ######### здесь мы отфильтруем результат по БЕ, по моделям ЕО, по ЕО, по категории работ, по году, по месяцу фильтрами из интерфейса. ############
+  
+  
+  model_hours_df_selected = model_hours_df.loc[:, ['eo_model_name', 'month_year','period_sort_index', 'calendar_fond_status', 'downtime_status']]
+  # Список моделей из выборки
+  eo_model_list = list(set(model_hours_df_selected['eo_model_name']))
+  # columns_list = ['модель', "янв 2023", "фев 2023", "мар 2023", "апр 2023", "май 2023", "июн 2023", "июл 2023", "авг 2023", "сен 2023",  "окт 2023", "ноя 2023", "дек 2023", "янв 2024", "фев 2024", "мар 2024", "апр 2024", "май 2024", "июн 2024", "июл 2024", "авг 2024", "сен 2024",  "окт 2024", "ноя 2024", "дек 2024", "янв 2025", "фев 2025", "мар 2025", "апр 2025", "май 2025", "июн 2025", "июл 2025", "авг 2025", "сен 2025",  "окт 2025", "ноя 2025", "дек 2025"]
+  columns_list = initial_values.months_list
+  
+  index_list = eo_model_list
+  ktg_table_df = pd.DataFrame(columns=columns_list, index=index_list)
+
+  # Сначала внешним циклом итерируемся по строкам таблицы - то есть по списку моделей ео
+  for eo_model in eo_model_list:
+    temp_dict = {}
+    # делаем срез  - все записи текущей модели ео
+    model_hours_df_selected_eo_model = model_hours_df_selected.loc[model_hours_df_selected['eo_model_name'] == eo_model]
+    model_hours_df_selected_eo_model_groupped = model_hours_df_selected_eo_model.groupby(['period_sort_index','month_year'], as_index = False)[['calendar_fond_status', 'downtime_status']].sum()
+    model_hours_df_selected_eo_model_groupped['ktg'] = (model_hours_df_selected_eo_model_groupped['calendar_fond_status'] - model_hours_df_selected_eo_model_groupped['downtime_status']) / model_hours_df_selected_eo_model_groupped['calendar_fond_status']
+
+    model_hours_df_selected_eo_model_groupped['ktg'] = model_hours_df_selected_eo_model_groupped['ktg'].apply(lambda x: round(x, 2))
+    
+    temp_dict['Модель ЕО'] = eo_model
+    # итерируемся по полученном временном срезу по модели
+    for row in model_hours_df_selected_eo_model_groupped.itertuples():
+      month_year = getattr(row, 'month_year')
+      ktg = getattr(row, 'ktg')
+      temp_dict[month_year] = ktg
+    ktg_table_df.loc[eo_model] = pd.Series(temp_dict)
+    
+    ktg_table_df = ktg_table_df.rename(columns = initial_values.period_dict)
+    print(ktg_table_df)
+    
+    # print(model_hours_df_selected_eo_model_groupped)
+    # model_hours_df_selected_eo_model.to_csv('data/model_hours_df_selected_eo_model_delete.csv')
+
+  
+  # for row in maintanance_jobs_df_selected.itertuples():
+  #   maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
+
+  
+
+ktg_table_prep()
 
 def total_qty_EO():
   """расчет количества машин в выборке для отображения в карточке 2023 года"""

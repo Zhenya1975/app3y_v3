@@ -32,10 +32,11 @@ dbc_css = (
     "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates@V1.0.1/dbc.min.css"
 )
  
-################# График простоев по месяцам за три года ###############################
+################# График КТГ по месяцам за три года ###############################
 def fig_ktg_by_years(theme_selector):
     
   '''График ктг по месяцам за три года'''
+  
   ktg_graph_data_df = pd.read_csv('widget_data/ktg_graph_data.csv')
   x_month_year = ktg_graph_data_df['Период']
   y_ktg = ktg_graph_data_df['Запланированный КТГ']

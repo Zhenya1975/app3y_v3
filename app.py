@@ -173,6 +173,7 @@ def maintanance(theme_selector, btn_update_n_click):
     functions.eo_list_download_preparation()
     functions.maint_jobs_download_preparation()
     functions.downtime_by_categiries_data()
+    functions.ktg_graph_data_preparation()
 
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector)
 
