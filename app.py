@@ -234,6 +234,18 @@ def funct_maint_jobs_table(n_clicks_maint_jobs_table):
   if n_clicks_maint_jobs_table:
     return dcc.send_data_frame(df.to_excel, "ТОИР воздействия.xlsx", index=False, sheet_name="ТОИР воздействия")
 
+####################### ОБРАБОТЧИК ВЫГРУЗКИ КТГ В EXCEL #####################################
+@app.callback(
+    Output("download_excel_ktg_table", "data"),
+    Input("btn_download_ktg_table", "n_clicks"),
+    prevent_initial_call=True,)
+def funct_ktg_table(n_clicks_ktg_table):
+  # df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str)
+  df = pd.read_csv('widget_data/ktg_table_data.csv', dtype = str, decimal=",")
+
+  if n_clicks_ktg_table:
+    return dcc.send_data_frame(df.to_excel, "КТГ по месяцам.xlsx", index=False, sheet_name="КТГ по месяцам")
+
 
 if __name__ == "__main__":
     # app.run_server(debug=True)

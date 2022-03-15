@@ -642,7 +642,7 @@ def ktg_table_prep():
 
     ktg_table_df.to_csv('widget_data/ktg_table_data.csv')
   
-ktg_table_prep()
+# ktg_table_prep()
 
 
 def total_qty_EO():
