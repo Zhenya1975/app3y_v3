@@ -8,6 +8,7 @@ import datetime
 
 import tab_main
 import functions
+import func_maintanance_jobs_df_prepare
 import widget_fig_downtime
 import widget_fig_ktg
 import widget_fig_piechart_downtime_2023
@@ -164,11 +165,11 @@ def maintanance(theme_selector, btn_update_n_click):
   # при нажатии на кнопку обновляем csv для построения графиков
   if btn_update_n_click:
     # Обновление данных для построения графика
-    # functions.pass_interval_fill()
-    # functions.maintanance_category_prep()
-    # functions.eo_job_catologue()
-    # functions.maintanance_jobs_df_prepare()
-    # functions.fill_calendar_fond()
+    functions.pass_interval_fill()
+    functions.maintanance_category_prep()
+    functions.eo_job_catologue()
+    func_maintanance_jobs_df_prepare.maintanance_jobs_df_prepare()
+    functions.fill_calendar_fond()
     functions.hour_calculation()
     functions.eo_list_download_preparation()
     functions.maint_jobs_download_preparation()
@@ -244,6 +245,18 @@ def funct_ktg_table(n_clicks_ktg_table):
   df = pd.read_csv('widget_data/ktg_table_data.csv', dtype = str, decimal=",")
 
   if n_clicks_ktg_table:
+    return dcc.send_data_frame(df.to_excel, "КТГ по месяцам.xlsx", index=False, sheet_name="КТГ по месяцам")
+
+####################### ОБРАБОТЧИК ВЫГРУЗКИ расширенная КТГ В EXCEL #####################################
+@app.callback(
+    Output("download_excel_ktg_extended_table", "data"),
+    Input("btn_download_ktg_extended_table", "n_clicks"),
+    prevent_initial_call=True,)
+def funct_extended_ktg_table(n_clicks_extended_ktg_table):
+  # df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str)
+  df = pd.read_csv('widget_data/ktg_table_data.csv', dtype = str, decimal=",")
+
+  if n_clicks_extended_ktg_table:
     return dcc.send_data_frame(df.to_excel, "КТГ по месяцам.xlsx", index=False, sheet_name="КТГ по месяцам")
 
 

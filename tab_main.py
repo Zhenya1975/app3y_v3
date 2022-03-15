@@ -186,6 +186,17 @@ def maintanance_chart_tab():
                                       dcc.Download(id="download_excel_ktg_table")
                                     ])
                                   ]
+                                 ),
+                          dbc.Col(width=2,
+                                  children=[
+                                    html.Div([
+                                      dbc.Button("Выгрузить КТГ расширенные данные, xlsx", id="btn_download_ktg_extended_table", size="sm",
+                                                 style={'marginBottom': '3px',
+                                                        'marginTop': '3px',
+                                                        'backgroundColor': '#232632'},),
+                                      dcc.Download(id="download_excel_ktg_extended_table")
+                                    ])
+                                  ]
                                  )
                         ])
                       ),
