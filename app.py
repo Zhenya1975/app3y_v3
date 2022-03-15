@@ -164,16 +164,17 @@ def maintanance(theme_selector, btn_update_n_click):
   # при нажатии на кнопку обновляем csv для построения графиков
   if btn_update_n_click:
     # Обновление данных для построения графика
-    functions.pass_interval_fill()
-    functions.maintanance_category_prep()
-    functions.eo_job_catologue()
-    functions.maintanance_jobs_df_prepare()
-    functions.fill_calendar_fond()
+    # functions.pass_interval_fill()
+    # functions.maintanance_category_prep()
+    # functions.eo_job_catologue()
+    # functions.maintanance_jobs_df_prepare()
+    # functions.fill_calendar_fond()
     functions.hour_calculation()
     functions.eo_list_download_preparation()
     functions.maint_jobs_download_preparation()
     functions.downtime_by_categiries_data()
     functions.ktg_graph_data_preparation()
+    functions.ktg_table_prep()
 
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector)
 
@@ -191,7 +192,7 @@ def maintanance(theme_selector, btn_update_n_click):
   eo_qty_2024_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2024)
   eo_qty_2025_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2025)
   
-  df_ktg_table = pd.read_csv('data/model_hours_ktg_data.csv')
+  df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
   new_loading_style = loading_style

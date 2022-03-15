@@ -613,7 +613,7 @@ def ktg_table_prep():
   model_hours_df_selected = model_hours_df.loc[:, ['eo_model_name', 'month_year','period_sort_index', 'calendar_fond_status', 'downtime_status']]
   # Список моделей из выборки
   eo_model_list = list(set(model_hours_df_selected['eo_model_name']))
-  # columns_list = ['модель', "янв 2023", "фев 2023", "мар 2023", "апр 2023", "май 2023", "июн 2023", "июл 2023", "авг 2023", "сен 2023",  "окт 2023", "ноя 2023", "дек 2023", "янв 2024", "фев 2024", "мар 2024", "апр 2024", "май 2024", "июн 2024", "июл 2024", "авг 2024", "сен 2024",  "окт 2024", "ноя 2024", "дек 2024", "янв 2025", "фев 2025", "мар 2025", "апр 2025", "май 2025", "июн 2025", "июл 2025", "авг 2025", "сен 2025",  "окт 2025", "ноя 2025", "дек 2025"]
+
   columns_list = initial_values.months_list
   
   index_list = eo_model_list
@@ -638,18 +638,12 @@ def ktg_table_prep():
     ktg_table_df.loc[eo_model] = pd.Series(temp_dict)
     
     ktg_table_df = ktg_table_df.rename(columns = initial_values.period_dict)
-    print(ktg_table_df)
-    
-    # print(model_hours_df_selected_eo_model_groupped)
-    # model_hours_df_selected_eo_model.to_csv('data/model_hours_df_selected_eo_model_delete.csv')
+    ktg_table_df.index.name = 'Наименование модели ЕО'
 
+    ktg_table_df.to_csv('widget_data/ktg_table_data.csv')
   
-  # for row in maintanance_jobs_df_selected.itertuples():
-  #   maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
-
-  
-
 ktg_table_prep()
+
 
 def total_qty_EO():
   """расчет количества машин в выборке для отображения в карточке 2023 года"""
