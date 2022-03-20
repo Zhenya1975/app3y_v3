@@ -30,10 +30,12 @@ def ktg_data_prep():
     maintanance_jobs_df = functions.maintanance_jobs_df()
     # читаем full_eo_list
     full_eo_list = functions.full_eo_list_func()
-    eo_list = ['100000084504']
+    eo_list = ['100000084504', '100000084492']
     # получаем заготовку hour_df
     hour_df = hour_table_df()
     # итерируемся по списку ео
+    ktg_by_month_data_df = pd.DataFrame(columns=['eo_code', 'year', 'month', 'calendar_fond', 'downtime'])
+
     for eo in eo_list:
         # заполняем колонку calendar_fond единичками в диапазоне срока эксплуатации машины
         maintanance_start_datetime = full_eo_list.loc[full_eo_list['eo_code'] == eo, ['operation_start_date']].values[0][0]
@@ -93,12 +95,16 @@ def ktg_data_prep():
             hour_df.loc[indexes_maint_job, ['maintanance_name']] = hour_df.loc[indexes_maint_job, ['maintanance_name']] + [[maintanance_name]]
 
 
+        # Теперь собираем результат в месяцы
+        eo_calendar_fond_downtime_by_month = hour_df.groupby(['year', 'month'], as_index=False)[['calendar_fond', 'downtime']].sum()
+        eo_calendar_fond_downtime_by_month['eo_code'] = eo
+        ktg_by_month_data_df = pd.concat([ktg_by_month_data_df, eo_calendar_fond_downtime_by_month], ignore_index=True)
+
+    # объединяем с таблицей машин
+    eo_data = full_eo_list.loc[:, ['eo_code', 'level_1_description', 'eo_model_name', 'eo_description', 'teh_mesto', 'mvz', 'constr_type', 'avearage_day_operation_hours_updated', 'operation_start_date', 'avearage_day_operation_hours',	'operation_finish_date', 'eo_main_class_description']]
+    ktg_by_month_data_df = pd.merge(ktg_by_month_data_df, eo_data, how='left', on='eo_code')
+    ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)
     hour_df.to_csv('data/hour_df.csv', decimal=",")
-
-
-
-
-
 
 
 
