@@ -376,7 +376,7 @@ def hour_calculation():
   
   return model_hours_df
 
-hour_calculation()
+# hour_calculation()
 
 def ktg_graph_data_preparation():
   """ПОДГОТОВКА ДАННЫХ ДЛЯ ПОСТРОЕНИЯ ГРАФИКА КТГ"""
