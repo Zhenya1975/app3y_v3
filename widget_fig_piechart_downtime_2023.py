@@ -34,30 +34,55 @@ dbc_css = (
 
 
 ############# PIECHART ПРОСТОИ ПО КАТЕГОРИЯМ #####################
-def fig_piechart_downtime_2023(theme_selector):  
-  downtime_by_categiries_2023 = pd.read_csv('widget_data/downtime_by_categiries_2023_data.csv')
-  
-  labels = list(downtime_by_categiries_2023['Вид ТОРО'])
-  values = list(downtime_by_categiries_2023['Простой, час'])
-  if theme_selector:
-      graph_template = 'seaborn'
-  else:
-      graph_template = 'plotly_dark'
-  planned_downtime_2023_piechart = go.Figure(data=[go.Pie(labels=labels, values=values)])
-  # planned_downtime_piechart.update_traces(textposition='inside')
-  planned_downtime_2023_piechart.update_layout(
-    # margin=dict(t=0, b=0, l=0, r=0),
-    autosize=False,
-    width=500,
-    height=500,
-    title_text='Простой по видам работ, 2023',
-    template=graph_template,
-    # uniformtext_minsize=12, uniformtext_mode='hide',
-    legend = dict(
-                # font=dict(color='#7f7f7f'), 
-                # orientation="h", # Looks much better horizontal than vertical
-                # y=0.6,
-                x = 1.6
-            ),
+def fig_piechart_downtime_2023(theme_selector):
+    # downtime_by_categiries_2023 = pd.read_csv('widget_data/downtime_by_categiries_2023_data.csv')
+    ktg_by_month_data_df = pd.read_csv('data/ktg_by_month_data_df.csv', decimal=',')
+    ktg_by_month_data_df['downtime'] = ktg_by_month_data_df['downtime'].astype(float)
+    job_list_df = pd.read_csv('data/job_list.csv')
+    job_list = list(job_list_df['maintanance_category_id'])
+    columns_list = job_list + ['downtime']
+    ktg_by_month_data_df_2023 = ktg_by_month_data_df.loc[ktg_by_month_data_df['year'] == 2023]
+    downtime_by_categories_2023 = ktg_by_month_data_df_2023.groupby(['year'], as_index=False)[columns_list].sum()
+    total_downtime = downtime_by_categories_2023.iloc[0]['downtime']
+
+
+    labels = []
+    values = []
+
+    for job_code in job_list:
+        downtime_value = downtime_by_categories_2023.iloc[0][job_code]
+        downtime_value_dolya = downtime_value / total_downtime
+        if downtime_value_dolya >0.02:
+            labels.append(job_code)
+            values.append(downtime_value)
+    # print(labels)
+    # print(values)
+
+
+
+
+    # labels = list(downtime_by_categories_2023['Вид ТОРО'])
+    # values = list(downtime_by_categories_2023['Простой, час'])
+    if theme_selector:
+        graph_template = 'seaborn'
+    else:
+        graph_template = 'plotly_dark'
+
+    planned_downtime_2023_piechart = go.Figure(data=[go.Pie(labels=labels, values=values)])
+    # planned_downtime_piechart.update_traces(textposition='inside')
+    planned_downtime_2023_piechart.update_layout(
+        # margin=dict(t=0, b=0, l=0, r=0),
+        autosize=False,
+        width=500,
+        height=500,
+        title_text='Простой по видам работ, 2023',
+        template=graph_template,
+        # uniformtext_minsize=12, uniformtext_mode='hide',
+        legend=dict(
+            # font=dict(color='#7f7f7f'),
+            # orientation="h", # Looks much better horizontal than vertical
+            # y=0.6,
+            x=1.6
+        ),
     )
-  return planned_downtime_2023_piechart
+    return planned_downtime_2023_piechart

@@ -31,12 +31,15 @@ def ktg_data_prep():
     # читаем full_eo_list
     full_eo_list = functions.full_eo_list_func()
     eo_list = ['100000084504', '100000084492']
-    # получаем заготовку hour_df
-    hour_df = hour_table_df()
+
     # итерируемся по списку ео
     ktg_by_month_data_df = pd.DataFrame(columns=['eo_code', 'year', 'month', 'calendar_fond', 'downtime'])
-
+    hour_df = hour_table_df()
     for eo in eo_list:
+        # получаем заготовку hour_df
+        hour_df = hour_table_df()
+        job_list = ['eto']
+        """в job_list складываем типы работ, чтобы петом по ним группироваться в месяцы"""
         # заполняем колонку calendar_fond единичками в диапазоне срока эксплуатации машины
         maintanance_start_datetime = full_eo_list.loc[full_eo_list['eo_code'] == eo, ['operation_start_date']].values[0][0]
         maintanance_finish_datetime = full_eo_list.loc[full_eo_list['eo_code'] == eo, ['operation_finish_date']].values[0][0]
@@ -72,12 +75,16 @@ def ktg_data_prep():
             # записываем значение простоя на ето в поле downtime
             hour_df.loc[indexes_maint_job, ['downtime']] = downtime_plan
             hour_df.loc[indexes_maint_job, ['maintanance_name']] = hour_df.loc[indexes_maint_job, ['maintanance_name']] + [['eto']]
+            hour_df.loc[indexes_maint_job, ['eto']] = downtime_plan
 
         # вторым проходом записываем единички в простои, не равные ето
         maint_df = maintanance_jobs_df_selected_by_eo.loc[maintanance_jobs_df_selected_by_eo['maintanance_category_id'] != "eto"]
         for row in maint_df.itertuples():
             maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
             maintanance_name = getattr(row, "maintanance_name")
+            maintanance_category_id = getattr(row, "maintanance_category_id")
+            if maintanance_category_id not in job_list:
+                job_list.append(maintanance_category_id)
 
             maintanance_category_id = getattr(row, "maintanance_category_id")
             maintanance_start_datetime = getattr(row, "maintanance_start_datetime")
@@ -93,20 +100,31 @@ def ktg_data_prep():
             # записываем единичку в поле downtime
             hour_df.loc[indexes_maint_job, ['downtime']] = 1
             hour_df.loc[indexes_maint_job, ['maintanance_name']] = hour_df.loc[indexes_maint_job, ['maintanance_name']] + [[maintanance_name]]
+            hour_df.loc[indexes_maint_job, [maintanance_category_id]] = 1
 
+
+        # заполняем пустые ячейки нулями
+        hour_df.fillna(0, inplace=True)
 
         # Теперь собираем результат в месяцы
-        eo_calendar_fond_downtime_by_month = hour_df.groupby(['year', 'month'], as_index=False)[['calendar_fond', 'downtime']].sum()
+
+        column_list = ['calendar_fond', 'downtime'] + job_list
+        job_list_df = pd.DataFrame(job_list, columns=['maintanance_category_id'])
+        job_list_df.to_csv('data/job_list.csv', index=False)
+        eo_calendar_fond_downtime_by_month = hour_df.groupby(['year', 'month'], as_index=False)[column_list].sum()
+
         eo_calendar_fond_downtime_by_month['eo_code'] = eo
         ktg_by_month_data_df = pd.concat([ktg_by_month_data_df, eo_calendar_fond_downtime_by_month], ignore_index=True)
+
 
     # объединяем с таблицей машин
     eo_data = full_eo_list.loc[:, ['eo_code', 'level_1_description', 'eo_model_name', 'eo_description', 'teh_mesto', 'mvz', 'constr_type', 'avearage_day_operation_hours_updated', 'operation_start_date', 'avearage_day_operation_hours',	'operation_finish_date', 'eo_main_class_description']]
     ktg_by_month_data_df = pd.merge(ktg_by_month_data_df, eo_data, how='left', on='eo_code')
+
     ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)
+    # ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)
+
     hour_df.to_csv('data/hour_df.csv', decimal=",")
-
-
 
 
 
