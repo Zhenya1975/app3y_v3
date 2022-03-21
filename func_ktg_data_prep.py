@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import timedelta
 import functions
 import initial_values
+import func_graph_downtime_data_prep
 
 last_day_of_selection = initial_values.last_day_of_selection
 
@@ -30,12 +31,17 @@ def ktg_data_prep():
     maintanance_jobs_df = functions.maintanance_jobs_df()
     # читаем full_eo_list
     full_eo_list = functions.full_eo_list_func()
-    eo_list = ['100000084504', '100000084492']
-
+    # eo_list = ['100000084504', '100000084492']
+    eo_list = list(set(maintanance_jobs_df['eo_code']))
     # итерируемся по списку ео
     ktg_by_month_data_df = pd.DataFrame(columns=['eo_code', 'year', 'month', 'calendar_fond', 'downtime'])
     hour_df = hour_table_df()
+    i=1
     for eo in eo_list:
+        progress_text = "eo ", i, " из ", len(eo_list)
+
+        print(progress_text)
+        i = i+1
         # получаем заготовку hour_df
         hour_df = hour_table_df()
         job_list = ['eto']
@@ -107,6 +113,7 @@ def ktg_data_prep():
         hour_df.fillna(0, inplace=True)
 
         # Теперь собираем результат в месяцы
+        
 
         column_list = ['calendar_fond', 'downtime'] + job_list
         job_list_df = pd.DataFrame(job_list, columns=['maintanance_category_id'])
@@ -122,12 +129,14 @@ def ktg_data_prep():
     ktg_by_month_data_df = pd.merge(ktg_by_month_data_df, eo_data, how='left', on='eo_code')
 
     ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)
+    # пересчитываем csv графика простоев
+    func_graph_downtime_data_prep.graph_downtime_data_prep()
     # ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)
 
-    hour_df.to_csv('data/hour_df.csv', decimal=",")
+    # hour_df.to_csv('data/hour_df.csv', decimal=",")
 
 
 
-ktg_data_prep()
+# ktg_data_prep()
 
 

@@ -45,6 +45,11 @@ def settings_tab():
                                        style={'marginBottom': '3px',
                                               'marginTop': '3px',
                                               'backgroundColor': '#232632'}, ),
+                          html.P(),
+                            dbc.Button("Расчет ktg_data", id="btn_calc_ktg_data", size="sm",
+                                       style={'marginBottom': '3px',
+                                              'marginTop': '3px',
+                                              'backgroundColor': '#232632'}, ),
                             
                         ]),
                       # html.Div([
@@ -107,6 +112,7 @@ def settings_tab():
                             # html.Hr(),                  
                             html.Div(id='output-data-upload'),
                           html.Div(id='output-data-2'),
+                          html.Div(id='output-data-3'),
                         ]),
 
 

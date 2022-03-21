@@ -10,6 +10,7 @@ import tab_main
 import settings_tab
 import functions
 import func_maintanance_jobs_df_prepare
+import func_ktg_data_prep
 import widget_fig_downtime
 import widget_fig_ktg
 import widget_fig_piechart_downtime_2023
@@ -148,13 +149,13 @@ app.layout = dbc.Container(
 ],
     [
       Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
-      Input("btn_update", "n_clicks"),
+      # Input("btn_update", "n_clicks"),
 
     ],
 )
 
-def maintanance(theme_selector, btn_update_n_click):
-  
+# def maintanance(theme_selector, btn_update_n_click):
+def maintanance(theme_selector):  
   changed_id = [p['prop_id'] for p in callback_context.triggered][0]
   if theme_selector:
       graph_template = 'sandstone'
@@ -165,19 +166,19 @@ def maintanance(theme_selector, btn_update_n_click):
 
   maintanance_jobs_df = functions.maintanance_jobs_df()
   # при нажатии на кнопку обновляем csv для построения графиков
-  if btn_update_n_click:
-    # Обновление данных для построения графика
-    functions.pass_interval_fill()
-    functions.maintanance_category_prep()
-    functions.eo_job_catologue()
-    func_maintanance_jobs_df_prepare.maintanance_jobs_df_prepare()
-    functions.fill_calendar_fond()
-    functions.hour_calculation()
-    functions.eo_list_download_preparation()
-    functions.maint_jobs_download_preparation()
-    functions.downtime_by_categiries_data()
-    functions.ktg_graph_data_preparation()
-    functions.ktg_table_prep()
+  # if btn_update_n_click:
+  #   # Обновление данных для построения графика
+  #   functions.pass_interval_fill()
+  #   functions.maintanance_category_prep()
+  #   functions.eo_job_catologue()
+  #   func_maintanance_jobs_df_prepare.maintanance_jobs_df_prepare()
+  #   functions.fill_calendar_fond()
+  #   functions.hour_calculation()
+  #   functions.eo_list_download_preparation()
+  #   functions.maint_jobs_download_preparation()
+  #   functions.downtime_by_categiries_data()
+  #   functions.ktg_graph_data_preparation()
+  #   functions.ktg_table_prep()
 
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector)
 
@@ -279,6 +280,7 @@ def funct(n_clicks_ktg_table):
     Input("btn_calc_maintanance_jobs_df", "n_clicks"),
     )
 def funct_maintanance_job_list_general_calc(n_clicks_maintanance_jobs_df_calc):
+  message_result = ""
   if n_clicks_maintanance_jobs_df_calc:
     func_maintanance_jobs_df_prepare.maintanance_jobs_df_prepare()
     # читаем результат
@@ -294,6 +296,31 @@ def funct_maintanance_job_list_general_calc(n_clicks_maintanance_jobs_df_calc):
       eo_qty = len(list(set(maintanance_jobs_df_selected['eo_code'])))
       message_dict[model] = eo_qty
     message_result = "maintanance_jobs_df_calc пересчитан. {} единицы".format(message_dict)  
+  return message_result
+
+# Обработчик кнопки расчета ktg_data_prep
+@app.callback(
+    Output("output-data-3", "children"),
+    Input("btn_calc_ktg_data", "n_clicks"),
+    )
+def funct_ktg_data_prep_calc(n_clicks_ktg_data_prep_calc):
+  message_result = ""
+  if n_clicks_ktg_data_prep_calc:
+    func_ktg_data_prep.ktg_data_prep()
+    # читаем результат
+    # maintanance_jobs_df = functions.maintanance_jobs_df()
+    # # список моделей
+    # model_list = list(set(maintanance_jobs_df['eo_model_name']))
+    # message_dict = {}
+    # for model in model_list:
+    #   #режем выборку по модели
+    #   maintanance_jobs_df_selected = maintanance_jobs_df.loc[maintanance_jobs_df['eo_model_name'] ==model]
+    #   # определяем количество ео в выборке
+      
+    #   eo_qty = len(list(set(maintanance_jobs_df_selected['eo_code'])))
+    #   message_dict[model] = eo_qty
+    # message_result = "maintanance_jobs_df_calc пересчитан. {} единицы".format(message_dict)  
+    message_result = "ktg_data пересчитан" 
   return message_result
 
 
