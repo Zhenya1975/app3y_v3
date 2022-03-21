@@ -7,6 +7,7 @@ from dash_bootstrap_templates import load_figure_template
 import datetime
 
 import tab_main
+import settings_tab
 import functions
 import func_maintanance_jobs_df_prepare
 import widget_fig_downtime
@@ -15,6 +16,7 @@ import widget_fig_piechart_downtime_2023
 import widget_fig_piechart_downtime_2024
 import widget_fig_piechart_downtime_2025
 import ktg_table_html
+
 # import tab_coverage
 # import tab_settings
 
@@ -111,7 +113,7 @@ app.layout = dbc.Container(
                                 # coverage_tab.coverage_tab(),
                                 # messages_orders_tab.messages_orders_tab(),
                                 # orders_moved_tab.orders_moved_tab(),
-                                # settings_tab.settings_tab()
+                                settings_tab.settings_tab()
 
                                 # tab2(),
                                 # tab3(),
@@ -260,6 +262,155 @@ def funct_extended_ktg_table(n_clicks_extended_ktg_table):
     return dcc.send_data_frame(df.to_excel, "КТГ по месяцам.xlsx", index=False, sheet_name="КТГ по месяцам")
 
 
+# Обработчик кнопки выгрузки в эксель таблицы с регламентом ТОИР
+@app.callback(
+    Output("download_maintanance_job_list_general", "data"),
+    Input("btn_download_maintanance_job_list_general", "n_clicks"),
+    prevent_initial_call=True,)
+def funct(n_clicks_ktg_table):
+  df = pd.read_csv('data/maintanance_job_list_general.csv')
+  if n_clicks_ktg_table:
+    return dcc.send_data_frame(df.to_excel, "maintanance_job_lis.xlsx", index=False, sheet_name="maintanance_job_lis")
+
+########## Настройки################
+
+
+def parse_contents(contents, filename):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+
+    try:
+        if 'csv' in filename:
+            # Assume that the user uploaded a CSV file
+            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+        elif 'xlsx' in filename and "maintanance_job_list_general" in filename:
+            # Assume that the user uploaded an excel file
+            df = pd.read_excel(io.BytesIO(decoded),decimal=',')
+            
+
+            # проверяем, что в файле есть нужные колонки 
+            list_of_columns_in_uploaded_df = df.columns.tolist()
+            check_column_list = ['maintanance_code_id', 'maintanance_code', 'maintanance_category_id','upper_level_tehmesto_code', 'maintanance_name', 'interval_motohours', 'downtime_planned', 'pass_interval', 'source']
+            control_value = 1
+            
+            for column in check_column_list:
+              if column in list_of_columns_in_uploaded_df:
+                continue
+              else:
+                control_value = 0
+          
+                break
+     
+            if control_value == 1:
+       
+              df.to_csv('data/maintanance_job_list_general.csv')
+              print("maintanance_job_list_general загружен")
+              functions.pass_interval_fill()
+              functions.maintanance_category_prep()
+              functions.eo_job_catologue()
+              print("eo_job_catologue обновлен")
+              
+            else:
+              print('не хватает колонок')
+            
+            # если мы загрузили список с работами, то надо подготовить данные для того чтобы вставить
+            # даты начала расчета для ТО-шек
+            
+
+        elif 'xlsx' in filename and "eo_job_catologue" in filename:
+            # Assume that the user uploaded an excel file
+            df = pd.read_excel(io.BytesIO(decoded))
+            # values = {"last_maintanance_date": default_to_start_date.date()}
+
+            #df.fillna(value=values)
+  
+            updated_eo_maintanance_job_code_last_date = df.loc[:, ['eo_maintanance_job_code', 'last_maintanance_date']]
+            
+            functions.fill_calendar_fond()
+            #functions.maintanance_matrix()
+            functions.eo_job_catologue()
+            functions.maintanance_jobs_df_prepare()
+        
+            updated_eo_maintanance_job_code_last_date.to_csv('data/eo_maintanance_job_code_last_date.csv')
+
+        # загружаем список eo - в ответ получаем список для перепроверки даты ввода в эксплуатацию, даты списания, среднесуточной наработки
+        elif 'xlsx' in filename and "eo_request_data" in filename:
+          # Assume that the user uploaded an excel file
+          df_eo_request_list = pd.read_excel(io.BytesIO(decoded), dtype=str)
+          # объединяем с full_eo_list
+          eo_list = pd.read_csv('data/full_eo_list_actual.csv', dtype=str)
+          eo_list_data = pd.merge(df_eo_request_list, eo_list, on = 'eo_code', how = 'left')
+          # объединяем с level_1
+          level_1 = pd.read_csv('data/level_1.csv')
+          eo_list_data = pd.merge(eo_list_data, level_1, on = 'level_1', how = 'left')
+          # объединяем с level_upper
+          level_upper = pd.read_csv('data/level_upper.csv', dtype=str)
+          eo_list_data = pd.merge(eo_list_data, level_upper, on = 'level_upper', how = 'left')
+          # объединяем с level_2
+          level_2 = pd.read_csv('data/level_2_list.csv', dtype=str)
+          eo_list_data = pd.merge(eo_list_data, level_2, on = 'level_2_path', how = 'left')
+          date_columns = ["operation_start_date", "operation_finish_date"]
+          # Колонку со строкой - в дату
+          for column in date_columns:
+            eo_list_data[column] =  eo_list_data[column].astype("datetime64[ns]")
+            # колонку  с datetime - в строку
+            eo_list_data[column] = eo_list_data[column].dt.strftime("%d.%m.%Y")
+          
+          eo_list_data = eo_list_data.loc[:, ['level_1_description', 'Название технического места', 'eo_code', 'eo_description', 'mvz', 'level_2_description', 'operation_start_date','operation_finish_date', 'avearage_day_operation_hours']]
+          eo_list_data.to_csv('data/eo_list_data_temp.csv', index = False)
+          
+          # print(df_eo_request_list)
+          df = df_eo_request_list
+          
+    except Exception as e:
+        print(e)
+        return html.Div([
+            'There was an error processing this file.'
+        ])
+
+    return html.Div([
+        html.H5(filename),
+
+
+        dash_table.DataTable(
+            data=df.to_dict('records'),
+            columns=[{'name': i, 'id': i} for i in df.columns],
+            filter_action='native',
+            style_header={
+                # 'backgroundColor': 'white',
+                'fontWeight': 'bold'
+            },
+            style_data={
+                'whiteSpace': 'normal',
+                'height': 'auto',
+            },
+            style_cell={'textAlign': 'left'},
+
+        ),
+
+        html.Hr(),  # horizontal line
+
+        # For debugging, display the raw contents provided by the web browser
+        # html.Div('Raw Content'),
+        # html.Pre(contents[0:200] + '...', style={
+        #     'whiteSpace': 'pre-wrap',
+        #     'wordBreak': 'break-all'
+        # })
+    ])
+
+@app.callback(Output('output-data-upload', 'children'),
+              Input('upload-data', 'contents'),
+              State('upload-data', 'filename'),
+              )
+def update_output_(list_of_contents, list_of_names):
+    if list_of_contents is not None:
+        children = [
+            parse_contents(c, n) for c, n in zip(list_of_contents, list_of_names)]
+        
+        return children
+
+
+
 if __name__ == "__main__":
     # app.run_server(debug=True)
-    app.run_server(host='0.0.0.0', debug=True)
+    app.run_server(host='0.0.0.0', debug=False)
