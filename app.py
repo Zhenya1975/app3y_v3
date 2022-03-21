@@ -19,6 +19,7 @@ import widget_fig_piechart_downtime_2025
 import ktg_table_html
 import func_be_select_data_prep
 import func_graph_downtime_data_prep
+import widget_table_ktg
 
 # import tab_coverage
 # import tab_settings
@@ -205,10 +206,6 @@ def maintanance(theme_selector, checklist_be):
   fig_piechart_downtime_2024 = widget_fig_piechart_downtime_2024.fig_piechart_downtime_2024(theme_selector)
   fig_piechart_downtime_2025 = widget_fig_piechart_downtime_2025.fig_piechart_downtime_2025(theme_selector)
   
-  
-  
-  df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
-  ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
   # если фильтр не трогали и его значение равно None, то вытаскиваем значение из сохраненного фильтра
   be_full_list = func_be_select_data_prep.be_select_data_prep()[2]
@@ -253,7 +250,10 @@ def maintanance(theme_selector, checklist_be):
   eo_qty_2025_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2025)
 
   fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector, be_list_for_dataframes_filtering)
-  
+
+  # df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
+  df_ktg_table = widget_table_ktg.ktg_table_prep(be_list_for_dataframes_filtering)
+  ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
   
   new_loading_style = loading_style
   return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style
