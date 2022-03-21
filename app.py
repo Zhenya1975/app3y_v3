@@ -21,6 +21,7 @@ import func_be_select_data_prep
 import func_graph_downtime_data_prep
 import widget_table_ktg
 import widget_download_eo
+import widget_download_maint_jobs
 
 # import tab_coverage
 # import tab_settings
@@ -258,6 +259,8 @@ def maintanance(theme_selector, checklist_be):
 
   # обновить csv для выгрузки eo
   widget_download_eo.eo_list_download_preparation(be_list_for_dataframes_filtering)
+  # обновить csv для выгрузки данных о работах
+  widget_download_maint_jobs.maint_jobs_download_preparation(be_list_for_dataframes_filtering)
   
   new_loading_style = loading_style
   return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style
