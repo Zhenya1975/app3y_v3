@@ -4,6 +4,7 @@ from dash_bootstrap_templates import ThemeSwitchAIO
 from dash_bootstrap_templates import load_figure_template
 import dash_bootstrap_components as dbc
 import initial_values
+import functions
 
 # select the Bootstrap stylesheet2 and figure template2 for the theme toggle here:
 # template_theme1 = "sketchy"
@@ -34,9 +35,11 @@ dbc_css = (
 
 
 ############# PIECHART ПРОСТОИ ПО КАТЕГОРИЯМ #####################
-def fig_piechart_downtime_2023(theme_selector):
+def fig_piechart_downtime_2023(theme_selector, be_list_for_dataframes_filtering):
     # downtime_by_categiries_2023 = pd.read_csv('widget_data/downtime_by_categiries_2023_data.csv')
-    ktg_by_month_data_df = pd.read_csv('data/ktg_by_month_data_df.csv', decimal=',')
+    ktg_by_month_data_df = functions.ktg_data_reading()
+    ktg_by_month_data_df = ktg_by_month_data_df.loc[ktg_by_month_data_df['level_1'].isin(be_list_for_dataframes_filtering)]
+   
     ktg_by_month_data_df['downtime'] = ktg_by_month_data_df['downtime'].astype(float)
     job_list_df = pd.read_csv('data/job_list.csv')
     job_list = list(job_list_df['maintanance_category_id'])
