@@ -3,7 +3,7 @@ import initial_values
 import functions
 
 def graph_downtime_data_prep(be_list_for_dataframes_filtering):
-  print("be_list_for_dataframes_filtering", be_list_for_dataframes_filtering)
+  
   ktg_by_month_data_df = functions.ktg_data_reading()
   ktg_by_month_data_df = ktg_by_month_data_df.loc[ktg_by_month_data_df['level_1'].isin(be_list_for_dataframes_filtering)]
   ktg_graph_data = ktg_by_month_data_df.groupby(['month_year'], as_index=False)['downtime'].sum()

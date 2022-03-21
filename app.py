@@ -199,7 +199,7 @@ def maintanance(theme_selector, checklist_be):
   #   functions.ktg_table_prep()
   
 
-  fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector)
+  
 
   fig_piechart_downtime_2023 = widget_fig_piechart_downtime_2023.fig_piechart_downtime_2023(theme_selector)
   fig_piechart_downtime_2024 = widget_fig_piechart_downtime_2024.fig_piechart_downtime_2024(theme_selector)
@@ -251,6 +251,8 @@ def maintanance(theme_selector, checklist_be):
   eo_qty_2023_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2023)
   eo_qty_2024_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2024)
   eo_qty_2025_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2025)
+
+  fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector, be_list_for_dataframes_filtering)
   
   
   new_loading_style = loading_style
