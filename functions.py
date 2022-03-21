@@ -453,10 +453,11 @@ def ktg_table_prep():
 # ktg_table_prep()
 
 
-def total_qty_EO():
+def total_qty_EO(be_list_for_dataframes_filtering):
   """расчет количества машин в выборке для отображения в карточке 2023 года"""
   # Читаем maintanance_jobs_df()
   maintanance_jobs_dataframe = maintanance_jobs_df()
+  maintanance_jobs_dataframe = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['level_1'].isin(be_list_for_dataframes_filtering)]
   maintanance_jobs_dataframe_2023 = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['year'] == 2023]
   maintanance_jobs_dataframe_2024 = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['year'] == 2024]
   maintanance_jobs_dataframe_2025 = maintanance_jobs_dataframe.loc[maintanance_jobs_dataframe['year'] == 2025]

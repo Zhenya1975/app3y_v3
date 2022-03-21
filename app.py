@@ -205,13 +205,7 @@ def maintanance(theme_selector, checklist_be):
   fig_piechart_downtime_2024 = widget_fig_piechart_downtime_2024.fig_piechart_downtime_2024(theme_selector)
   fig_piechart_downtime_2025 = widget_fig_piechart_downtime_2025.fig_piechart_downtime_2025(theme_selector)
   
-  total_qty_EO_2023 = functions.total_qty_EO()[0]
-  total_qty_EO_2024 = functions.total_qty_EO()[1]
-  total_qty_EO_2025 = functions.total_qty_EO()[2]
   
-  eo_qty_2023_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2023)
-  eo_qty_2024_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2024)
-  eo_qty_2025_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2025)
   
   df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
@@ -249,6 +243,15 @@ def maintanance(theme_selector, checklist_be):
   
   fig_downtime_data = func_graph_downtime_data_prep.graph_downtime_data_prep(be_list_for_dataframes_filtering)
   fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector, fig_downtime_data)
+
+  total_qty_EO_2023 = functions.total_qty_EO(be_list_for_dataframes_filtering)[0]
+  total_qty_EO_2024 = functions.total_qty_EO(be_list_for_dataframes_filtering)[1]
+  total_qty_EO_2025 = functions.total_qty_EO(be_list_for_dataframes_filtering)[2]
+  
+  eo_qty_2023_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2023)
+  eo_qty_2024_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2024)
+  eo_qty_2025_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2025)
+  
   
   new_loading_style = loading_style
   return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style
