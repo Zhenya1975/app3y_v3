@@ -6,7 +6,7 @@ def be_select_data_prep():
   with open('saved_filters.json', 'r') as openfile:
     # Reading from json file
     saved_filters_dict = json.load(openfile)
-  print("saved_filters_dict", saved_filters_dict)
+  # print("saved_filters_dict", saved_filters_dict)
   
   ktg_by_month_data_df = pd.read_csv('data/ktg_by_month_data_df.csv', decimal = ",")
   be_list = list(set(ktg_by_month_data_df['level_1']))
@@ -34,7 +34,7 @@ def be_select_data_prep():
   #  json.dump(saved_filters_dict, jsonFile)
   # print(be_checklist_data)
   be_values = saved_filters_dict['filter_be']
-  print("сохраненный фильтр", saved_filters_dict['filter_be'])
+  # print("сохраненный фильтр", saved_filters_dict['filter_be'])
   return be_checklist_data, be_values
 
 # be_select_data_prep()

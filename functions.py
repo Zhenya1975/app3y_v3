@@ -1,6 +1,7 @@
 import pandas as pd
 import initial_values
 from datetime import timedelta
+import json
 
 first_day_of_selection = initial_values.first_day_of_selection
 last_day_of_selection = initial_values.last_day_of_selection
@@ -41,7 +42,14 @@ def last_maint_date_func():
 def maintanance_jobs_df():
     """чтение maintanance_jobs_df"""
     maintanance_jobs_df = pd.read_csv('data/maintanance_jobs_df.csv', dtype=str)
-
+    with open('saved_filters.json', 'r') as openfile:
+      # Reading from json file
+      saved_filters_dict = json.load(openfile)
+    be_filter = saved_filters_dict['filter_be']
+    full_be_list = list(set(maintanance_jobs_df['level_1']))
+    if be_filter == []:
+      be_filter = full_be_list
+    maintanance_jobs_df = maintanance_jobs_df.loc[maintanance_jobs_df["level_1"].isin(be_filter)]
     maintanance_jobs_df = maintanance_jobs_df.astype({'downtime_plan': float, "month_year_sort_index": int, "year":int, "month":int, "day": int, "hour":int})
 
     return maintanance_jobs_df
@@ -291,6 +299,7 @@ def hour_calculation():
   # ПРОСТОИ. Нужно итерировать по таблице с простоями. Получать из нее ЕО момент начала ремонта и величину простоя
   # определить момент окончания. Затем отрезать мастер таблицу по этому периоду и поместить в поле простоя единички
   maintanance_jobs_df_ = maintanance_jobs_df()
+
   maintanance_jobs_df_selected = maintanance_jobs_df_.loc[:,
                                  ['maintanance_jobs_id', 'eo_code','maintanance_category_id', 'maintanance_name', 'maintanance_start_datetime', 'maintanance_finish_datetime', 'downtime_plan']]
   maintanance_jobs_df_selected.to_csv('data/maintanance_jobs_df_selected_delete.csv', index = False)
