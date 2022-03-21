@@ -14,6 +14,8 @@ def graph_downtime_data_prep():
   
   ktg_graph_data['period_sort_index'] = ktg_graph_data['month_year'].map(period_sort_index)
   ktg_graph_data.sort_values(by='period_sort_index', inplace = True)
+  ktg_graph_data['downtime'] = ktg_graph_data['downtime'].astype(int)
+  # ktg_graph_data['downtime'] = ktg_graph_data['downtime'].apply(lambda x: round(x, 0))
   
   ktg_graph_data.rename(columns={'period': 'Период', 'downtime': "Запланированный простой, час"}, inplace=True)
   ktg_graph_data = ktg_graph_data.loc[:, ['Период', 'Запланированный простой, час']]
