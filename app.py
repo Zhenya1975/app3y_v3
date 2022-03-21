@@ -261,6 +261,7 @@ def funct_extended_ktg_table(n_clicks_extended_ktg_table):
   if n_clicks_extended_ktg_table:
     return dcc.send_data_frame(df.to_excel, "КТГ по месяцам.xlsx", index=False, sheet_name="КТГ по месяцам")
 
+########## Настройки################
 
 # Обработчик кнопки выгрузки в эксель таблицы с регламентом ТОИР
 @app.callback(
@@ -270,9 +271,32 @@ def funct_extended_ktg_table(n_clicks_extended_ktg_table):
 def funct(n_clicks_ktg_table):
   df = pd.read_csv('data/maintanance_job_list_general.csv')
   if n_clicks_ktg_table:
-    return dcc.send_data_frame(df.to_excel, "maintanance_job_lis.xlsx", index=False, sheet_name="maintanance_job_lis")
+    return dcc.send_data_frame(df.to_excel, "maintanance_job_list.xlsx", index=False, sheet_name="maintanance_job_list")
 
-########## Настройки################
+# Обработчик кнопки расчета maintanance_jobs_df
+@app.callback(
+    Output("output-data-2", "children"),
+    Input("btn_calc_maintanance_jobs_df", "n_clicks"),
+    )
+def funct_maintanance_job_list_general_calc(n_clicks_maintanance_jobs_df_calc):
+  if n_clicks_maintanance_jobs_df_calc:
+    func_maintanance_jobs_df_prepare.maintanance_jobs_df_prepare()
+    # читаем результат
+    maintanance_jobs_df = functions.maintanance_jobs_df()
+    # список моделей
+    model_list = list(set(maintanance_jobs_df['eo_model_name']))
+    message_dict = {}
+    for model in model_list:
+      #режем выборку по модели
+      maintanance_jobs_df_selected = maintanance_jobs_df.loc[maintanance_jobs_df['eo_model_name'] ==model]
+      # определяем количество ео в выборке
+      
+      eo_qty = len(list(set(maintanance_jobs_df_selected['eo_code'])))
+      message_dict[model] = eo_qty
+    message_result = "maintanance_jobs_df_calc пересчитан. {} единицы".format(message_dict)  
+  return message_result
+
+
 
 
 def parse_contents(contents, filename):
@@ -411,6 +435,7 @@ def update_output_(list_of_contents, list_of_names):
 
 
 
+
 if __name__ == "__main__":
     # app.run_server(debug=True)
-    app.run_server(host='0.0.0.0', debug=False)
+    app.run_server(host='0.0.0.0', debug=True)

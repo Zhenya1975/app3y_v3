@@ -8,6 +8,7 @@ last_day_of_selection = initial_values.last_day_of_selection
 
 def maintanance_jobs_df_prepare():
   '''подготовка файла со списком работ - основной файл для построения графика простоев'''
+  print('расчет maintanance_jobs_df начат')
   eo_job_catologue_df = functions.eo_job_catologue_df_func()
   full_eo_list = functions.full_eo_list_func()
   # выдергиваем из full_eo_list 'eo_code', 'avearage_day_operation_hours'
@@ -242,6 +243,7 @@ def maintanance_jobs_df_prepare():
 
   # print(len(maintanance_jobs_df))
   # maintanance_jobs_df.to_csv('data/maintanance_jobs_df_full_list_delete.csv')
+  print("расчет maintanance_jobs_df завершен")
   return maintanance_jobs_df
 
 # maintanance_jobs_df_prepare()

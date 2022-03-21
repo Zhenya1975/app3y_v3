@@ -37,16 +37,16 @@ def settings_tab():
                             dcc.Download(id="download_maintanance_job_list_general")
                         ]),
 
-                        # html.Div([
-                        #     html.P(),
+                        html.Div([
+                            html.P(),
                             
-                        #     html.P(),
-                        #     dbc.Button("Выгрузить eo_job_catologue.xlsx", id="btn_download_eo_job_catologue", size="sm",
-                        #                style={'marginBottom': '3px',
-                        #                       'marginTop': '3px',
-                        #                       'backgroundColor': '#232632'}, ),
-                        #     dcc.Download(id="download_eo_job_catologue")
-                        # ]),
+                            html.P(),
+                            dbc.Button("Расчет maintanance_jobs_df", id="btn_calc_maintanance_jobs_df", size="sm",
+                                       style={'marginBottom': '3px',
+                                              'marginTop': '3px',
+                                              'backgroundColor': '#232632'}, ),
+                            
+                        ]),
                       # html.Div([
                       #       html.P(),
                             
@@ -106,6 +106,7 @@ def settings_tab():
                             #                   'backgroundColor': '#232632'}, ),href='/'),
                             # html.Hr(),                  
                             html.Div(id='output-data-upload'),
+                          html.Div(id='output-data-2'),
                         ]),
 
 
