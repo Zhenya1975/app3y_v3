@@ -23,7 +23,7 @@ def ktg_table_prep(be_list_for_dataframes_filtering):
   columns_list = ['Модель ЕО'] + columns_list
   index_list = eo_model_list
   ktg_table_df = pd.DataFrame(columns=columns_list, index=index_list)
-  print(ktg_table_df)
+  
   # Сначала внешним циклом итерируемся по строкам таблицы - то есть по списку моделей ео
   for eo_model in eo_model_list:
     temp_dict = {}
@@ -49,8 +49,8 @@ def ktg_table_prep(be_list_for_dataframes_filtering):
   ktg_table_df = ktg_table_df.rename(columns = initial_values.period_dict)
   ktg_table_df.index.name = 'Наименование модели ЕО'
   # ktg_table_df['Наименование модели'] = ktg_table_df.index
-  # print(ktg_table_df)
-  ktg_table_df.to_csv('widget_data/ktg_table_data.csv')
+
+  ktg_table_df.to_csv('widget_data/ktg_table_data.csv', index = False)
   return ktg_table_df
 
   

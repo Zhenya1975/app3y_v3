@@ -20,6 +20,7 @@ import ktg_table_html
 import func_be_select_data_prep
 import func_graph_downtime_data_prep
 import widget_table_ktg
+import widget_download_eo
 
 # import tab_coverage
 # import tab_settings
@@ -182,7 +183,7 @@ def maintanance(theme_selector, checklist_be):
   # elif checklist_be != None:
   #   be_filter = checklist_be
     
-  maintanance_jobs_df = functions.maintanance_jobs_df()
+  # maintanance_jobs_df = functions.maintanance_jobs_df()
   
   # при нажатии на кнопку обновляем csv для построения графиков
   # if btn_update_n_click:
@@ -254,6 +255,9 @@ def maintanance(theme_selector, checklist_be):
   # df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
   df_ktg_table = widget_table_ktg.ktg_table_prep(be_list_for_dataframes_filtering)
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
+
+  # обновить csv для выгрузки eo
+  widget_download_eo.eo_list_download_preparation(be_list_for_dataframes_filtering)
   
   new_loading_style = loading_style
   return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style

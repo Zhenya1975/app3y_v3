@@ -90,7 +90,7 @@ def fig_ktg_by_years(theme_selector, be_list_for_dataframes_filtering):
     showgrid=False, 
     # ticklabelmode="period"
   )
-  fig_ktg.update_yaxes(range = [0.5,1])
+  fig_ktg.update_yaxes(range = [0,1])
   
   fig_ktg.update_traces(
     text = text_list_downtime_month_year,
