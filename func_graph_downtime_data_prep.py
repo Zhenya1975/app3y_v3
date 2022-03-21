@@ -2,7 +2,7 @@ import pandas as pd
 import initial_values
 
 def graph_downtime_data_prep():
-  ktg_by_month_data_df = pd.read_csv('data/ktg_by_month_data_df.csv')
+  ktg_by_month_data_df = pd.read_csv('data/ktg_by_month_data_df.csv', decimal = ",")
   ktg_by_month_data_df['month_year'] = ktg_by_month_data_df['month'].astype(str) + "_" + ktg_by_month_data_df['year'].astype(str)
   ktg_graph_data = ktg_by_month_data_df.groupby(['month_year'], as_index=False)['downtime'].sum()
   

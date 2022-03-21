@@ -3,6 +3,7 @@ from datetime import timedelta
 import functions
 import initial_values
 import func_graph_downtime_data_prep
+import func_be_select_data_prep
 
 last_day_of_selection = initial_values.last_day_of_selection
 
@@ -38,7 +39,7 @@ def ktg_data_prep():
     hour_df = hour_table_df()
     i=1
     for eo in eo_list:
-        progress_text = "eo ", i, " из ", len(eo_list)
+        progress_text = "eo " + str(i) + " из " + str(len(eo_list))
 
         print(progress_text)
         i = i+1
@@ -122,8 +123,9 @@ def ktg_data_prep():
 
         eo_calendar_fond_downtime_by_month['eo_code'] = eo
         ktg_by_month_data_df = pd.concat([ktg_by_month_data_df, eo_calendar_fond_downtime_by_month], ignore_index=True)
+        
 
-
+    ktg_by_month_data_df.fillna(0, inplace=True)
     # объединяем с таблицей машин
     eo_data = full_eo_list.loc[:, ['eo_code', 'level_1_description', 'eo_model_name', 'eo_description', 'teh_mesto', 'mvz', 'constr_type', 'avearage_day_operation_hours_updated', 'operation_start_date', 'avearage_day_operation_hours',	'operation_finish_date', 'eo_main_class_description']]
     ktg_by_month_data_df = pd.merge(ktg_by_month_data_df, eo_data, how='left', on='eo_code')
@@ -131,7 +133,9 @@ def ktg_data_prep():
     ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)
     # пересчитываем csv графика простоев
     func_graph_downtime_data_prep.graph_downtime_data_prep()
-    # ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)
+    # пересчитываем данные для списка фильтра БЕ
+    func_be_select_data_prep.be_select_data_prep()
+
 
     # hour_df.to_csv('data/hour_df.csv', decimal=",")
 

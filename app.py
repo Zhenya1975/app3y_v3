@@ -17,6 +17,7 @@ import widget_fig_piechart_downtime_2023
 import widget_fig_piechart_downtime_2024
 import widget_fig_piechart_downtime_2025
 import ktg_table_html
+import func_be_select_data_prep
 
 # import tab_coverage
 # import tab_settings
@@ -134,6 +135,8 @@ app.layout = dbc.Container(
 
 ######################### ОСНОВНОЙ ОБРАБОТЧИК ДЛЯ ПОСТРОЕНИЯ ГРАФИКОВ ##############################
 @app.callback([
+    Output("checklist_level_1", "value"),
+    Output("checklist_level_1", "options"),
     Output('eo_qty_2023', 'children'),
     Output('eo_qty_2024', 'children'),
     Output('eo_qty_2025', 'children'),
@@ -149,13 +152,15 @@ app.layout = dbc.Container(
 ],
     [
       Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
+      Input('checklist_level_1', "value"),
+
       # Input("btn_update", "n_clicks"),
 
     ],
 )
 
 # def maintanance(theme_selector, btn_update_n_click):
-def maintanance(theme_selector):  
+def maintanance(theme_selector, checklist_be):  
   changed_id = [p['prop_id'] for p in callback_context.triggered][0]
   if theme_selector:
       graph_template = 'sandstone'
@@ -199,8 +204,11 @@ def maintanance(theme_selector):
   df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
+  checklist_be_value = func_be_select_data_prep.be_select_data_prep()[1]
+  checklist_be_options = func_be_select_data_prep.be_select_data_prep()[0]
+  
   new_loading_style = loading_style
-  return eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style
+  return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style
 
 
 
@@ -250,17 +258,7 @@ def funct_ktg_table(n_clicks_ktg_table):
   if n_clicks_ktg_table:
     return dcc.send_data_frame(df.to_excel, "КТГ по месяцам.xlsx", index=False, sheet_name="КТГ по месяцам")
 
-####################### ОБРАБОТЧИК ВЫГРУЗКИ расширенная КТГ В EXCEL #####################################
-@app.callback(
-    Output("download_excel_ktg_extended_table", "data"),
-    Input("btn_download_ktg_extended_table", "n_clicks"),
-    prevent_initial_call=True,)
-def funct_extended_ktg_table(n_clicks_extended_ktg_table):
-  # df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str)
-  df = pd.read_csv('widget_data/ktg_table_data.csv', dtype = str, decimal=",")
 
-  if n_clicks_extended_ktg_table:
-    return dcc.send_data_frame(df.to_excel, "КТГ по месяцам.xlsx", index=False, sheet_name="КТГ по месяцам")
 
 ########## Настройки################
 
