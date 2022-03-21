@@ -35,7 +35,7 @@ def be_select_data_prep():
   # print(be_checklist_data)
   be_values = saved_filters_dict['filter_be']
   # print("сохраненный фильтр", saved_filters_dict['filter_be'])
-  return be_checklist_data, be_values
+  return be_checklist_data, be_values, be_values_total
 
 # be_select_data_prep()
 

@@ -18,6 +18,7 @@ import widget_fig_piechart_downtime_2024
 import widget_fig_piechart_downtime_2025
 import ktg_table_html
 import func_be_select_data_prep
+import func_graph_downtime_data_prep
 
 # import tab_coverage
 # import tab_settings
@@ -196,8 +197,7 @@ def maintanance(theme_selector, checklist_be):
   #   functions.downtime_by_categiries_data()
   #   functions.ktg_graph_data_preparation()
   #   functions.ktg_table_prep()
-
-  fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector)
+  
 
   fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector)
 
@@ -216,18 +216,39 @@ def maintanance(theme_selector, checklist_be):
   df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
+  # если фильтр не трогали и его значение равно None, то вытаскиваем значение из сохраненного фильтра
+  be_full_list = func_be_select_data_prep.be_select_data_prep()[2]
+  
   if checklist_be == None:
-    checklist_be_value = func_be_select_data_prep.be_select_data_prep()[1]
-  if checklist_be != None:
+    checklist_be_value = saved_filters_dict['filter_be']
+    if len(checklist_be_value) == 0:
+      be_list_for_dataframes_filtering = be_full_list
+    else:
+      be_list_for_dataframes_filtering = checklist_be_value
+
+  # если в фильтре что-то есть и он не пустой то берем значение из фильтра и переписываем json
+  elif checklist_be != None and len(checklist_be) != 0:
+    be_list_for_dataframes_filtering = checklist_be
     saved_filters_dict['filter_be'] = checklist_be
     # записываем в json
     with open("saved_filters.json", "w") as jsonFile:
       json.dump(saved_filters_dict, jsonFile)
     checklist_be_value = checklist_be
-    
+  # ессли фильтр трогали, но очистили то фильтр надо очистить
+  elif len(checklist_be) == 0:
+    be_list_for_dataframes_filtering = be_full_list
+    saved_filters_dict['filter_be'] = checklist_be
+    # записываем в json
+    with open("saved_filters.json", "w") as jsonFile:
+      json.dump(saved_filters_dict, jsonFile)
+    checklist_be_value = checklist_be
   # checklist_be_value = []
   checklist_be_options = func_be_select_data_prep.be_select_data_prep()[0]
-  # checklist_be_options = []
+
+  # таким образом, мы получили значение из фильтра be и теперь можем отфильтровать данные для виджетов
+  
+  fig_downtime_data = func_graph_downtime_data_prep.graph_downtime_data_prep(be_list_for_dataframes_filtering)
+  fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector, fig_downtime_data)
   
   new_loading_style = loading_style
   return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style

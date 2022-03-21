@@ -1,9 +1,11 @@
 import pandas as pd
 import initial_values
+import functions
 
-def graph_downtime_data_prep():
-  ktg_by_month_data_df = pd.read_csv('data/ktg_by_month_data_df.csv', decimal = ",")
-  ktg_by_month_data_df['month_year'] = ktg_by_month_data_df['month'].astype(str) + "_" + ktg_by_month_data_df['year'].astype(str)
+def graph_downtime_data_prep(be_list_for_dataframes_filtering):
+  print("be_list_for_dataframes_filtering", be_list_for_dataframes_filtering)
+  ktg_by_month_data_df = functions.ktg_data_reading()
+  ktg_by_month_data_df = ktg_by_month_data_df.loc[ktg_by_month_data_df['level_1'].isin(be_list_for_dataframes_filtering)]
   ktg_graph_data = ktg_by_month_data_df.groupby(['month_year'], as_index=False)['downtime'].sum()
   
   period_dict = initial_values.period_dict
@@ -20,4 +22,5 @@ def graph_downtime_data_prep():
   ktg_graph_data.rename(columns={'period': 'Период', 'downtime': "Запланированный простой, час"}, inplace=True)
   ktg_graph_data = ktg_graph_data.loc[:, ['Период', 'Запланированный простой, час']]
   ktg_graph_data.to_csv('widget_data/downtime_graph_data.csv', index = False)
-graph_downtime_data_prep()
+  return ktg_graph_data
+# graph_downtime_data_prep()

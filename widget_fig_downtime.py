@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 from dash_bootstrap_templates import ThemeSwitchAIO
 from dash_bootstrap_templates import load_figure_template
 import dash_bootstrap_components as dbc
+import func_graph_downtime_data_prep
 
 import functions
 
@@ -33,10 +34,11 @@ dbc_css = (
 )
  
 ################# График простоев по месяцам за три года ###############################
-def fig_downtime_by_years(theme_selector):
+def fig_downtime_by_years(theme_selector, fig_downtime_data):
     
   '''График простоев по месяцам за три года'''
-  downtime_graph_data_df = pd.read_csv('widget_data/downtime_graph_data.csv')
+  # downtime_graph_data_df = pd.read_csv('widget_data/downtime_graph_data.csv')
+  downtime_graph_data_df = fig_downtime_data
   x_month_year = downtime_graph_data_df['Период']
   y_downtime = downtime_graph_data_df['Запланированный простой, час']
   text_list_downtime_month_year = downtime_graph_data_df['Запланированный простой, час']

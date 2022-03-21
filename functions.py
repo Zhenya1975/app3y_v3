@@ -38,6 +38,12 @@ def last_maint_date_func():
 
     return last_maint_date
 
+def ktg_data_reading():
+  """чтение данных ктг"""
+  ktg_by_month_data_df = pd.read_csv('data/ktg_by_month_data_df.csv', decimal = ",")
+  ktg_by_month_data_df['month_year'] = ktg_by_month_data_df['month'].astype(str) + "_" + ktg_by_month_data_df['year'].astype(str)
+  
+  return ktg_by_month_data_df
 
 def maintanance_jobs_df():
     """чтение maintanance_jobs_df"""
