@@ -161,6 +161,13 @@ app.layout = dbc.Container(
 
 # def maintanance(theme_selector, btn_update_n_click):
 def maintanance(theme_selector, checklist_be):  
+   # читаем файл с дефолтными фильтрами
+    # Opening JSON file
+  with open('saved_filters.json', 'r') as openfile:
+    # Reading from json file
+    saved_filters_dict = json.load(openfile)
+
+  
   changed_id = [p['prop_id'] for p in callback_context.triggered][0]
   if theme_selector:
       graph_template = 'sandstone'
@@ -168,8 +175,13 @@ def maintanance(theme_selector, checklist_be):
 
   else:
       graph_template = 'plotly_dark'
-
+  # if checklist_be == None:
+  #   be_filter = func_be_select_data_prep.be_select_data_prep()[1]
+  # elif checklist_be != None:
+  #   be_filter = checklist_be
+    
   maintanance_jobs_df = functions.maintanance_jobs_df()
+  
   # при нажатии на кнопку обновляем csv для построения графиков
   # if btn_update_n_click:
   #   # Обновление данных для построения графика
@@ -204,8 +216,18 @@ def maintanance(theme_selector, checklist_be):
   df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
-  checklist_be_value = func_be_select_data_prep.be_select_data_prep()[1]
+  if checklist_be == None:
+    checklist_be_value = func_be_select_data_prep.be_select_data_prep()[1]
+  if checklist_be != None:
+    saved_filters_dict['filter_be'] = checklist_be
+    # записываем в json
+    with open("saved_filters.json", "w") as jsonFile:
+      json.dump(saved_filters_dict, jsonFile)
+    checklist_be_value = checklist_be
+    
+  # checklist_be_value = []
   checklist_be_options = func_be_select_data_prep.be_select_data_prep()[0]
+  # checklist_be_options = []
   
   new_loading_style = loading_style
   return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style

@@ -33,6 +33,8 @@ def ktg_data_prep():
     # читаем full_eo_list
     full_eo_list = functions.full_eo_list_func()
     # eo_list = ['100000084504', '100000084492']
+    # eo_list = ['100000065619']
+  
     eo_list = list(set(maintanance_jobs_df['eo_code']))
     # итерируемся по списку ео
     ktg_by_month_data_df = pd.DataFrame(columns=['eo_code', 'year', 'month', 'calendar_fond', 'downtime'])
@@ -127,7 +129,7 @@ def ktg_data_prep():
 
     ktg_by_month_data_df.fillna(0, inplace=True)
     # объединяем с таблицей машин
-    eo_data = full_eo_list.loc[:, ['eo_code', 'level_1_description', 'eo_model_name', 'eo_description', 'teh_mesto', 'mvz', 'constr_type', 'avearage_day_operation_hours_updated', 'operation_start_date', 'avearage_day_operation_hours',	'operation_finish_date', 'eo_main_class_description']]
+    eo_data = full_eo_list.loc[:, ['eo_code', 'level_1', 'eo_model_name', 'eo_description', 'teh_mesto', 'mvz', 'constr_type', 'avearage_day_operation_hours_updated', 'operation_start_date', 'avearage_day_operation_hours',	'operation_finish_date', 'eo_main_class_description']]
     ktg_by_month_data_df = pd.merge(ktg_by_month_data_df, eo_data, how='left', on='eo_code')
 
     ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)

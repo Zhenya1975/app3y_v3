@@ -206,7 +206,7 @@ def maintanance_jobs_df_prepare():
       maintanance_jobs_df['maintanance_start_datetime'] <= last_day_of_selection]
 
   ############# прицепляем eo_model_id #############################
-  eo_model_id_eo_list = full_eo_list.loc[:, ['eo_code', 'eo_model_id', 'eo_model_name', 'level_upper']]
+  eo_model_id_eo_list = full_eo_list.loc[:, ['eo_code', 'eo_model_id', 'eo_model_name', 'level_upper', 'level_1']]
   maintanance_jobs_df = pd.merge(maintanance_jobs_df, eo_model_id_eo_list, on='eo_code', how='left')
 
   maintanance_jobs_df['maintanance_date'] = maintanance_jobs_df['maintanance_start_datetime'].astype(str)
@@ -243,7 +243,7 @@ def maintanance_jobs_df_prepare():
 
   # print(len(maintanance_jobs_df))
   # maintanance_jobs_df.to_csv('data/maintanance_jobs_df_full_list_delete.csv')
-  print("расчет maintanance_jobs_df завершен")
+  # print("расчет maintanance_jobs_df завершен")
   return maintanance_jobs_df
 
 # maintanance_jobs_df_prepare()

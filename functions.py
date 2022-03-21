@@ -41,6 +41,7 @@ def last_maint_date_func():
 def maintanance_jobs_df():
     """чтение maintanance_jobs_df"""
     maintanance_jobs_df = pd.read_csv('data/maintanance_jobs_df.csv', dtype=str)
+
     maintanance_jobs_df = maintanance_jobs_df.astype({'downtime_plan': float, "month_year_sort_index": int, "year":int, "month":int, "day": int, "hour":int})
 
     return maintanance_jobs_df

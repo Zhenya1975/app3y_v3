@@ -51,7 +51,10 @@ def fig_piechart_downtime_2023(theme_selector):
 
     for job_code in job_list:
         downtime_value = downtime_by_categories_2023.iloc[0][job_code]
-        downtime_value_dolya = downtime_value / total_downtime
+        if total_downtime !=0:
+          downtime_value_dolya = downtime_value / total_downtime
+        else:
+          downtime_value_dolya = 0
         if downtime_value_dolya >0.02:
             labels.append(job_code)
             values.append(downtime_value)
