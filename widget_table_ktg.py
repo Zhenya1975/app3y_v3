@@ -7,6 +7,7 @@ def ktg_table_prep(be_list_for_dataframes_filtering):
   ktg_by_month_data_df = functions.ktg_data_reading()
   ktg_by_month_data_df = ktg_by_month_data_df.loc[ktg_by_month_data_df['level_1'].isin(be_list_for_dataframes_filtering)]
   ktg_graph_data = ktg_by_month_data_df.groupby(['eo_model_name', 'month_year'], as_index=False)[['calendar_fond', 'downtime']].sum()
+  ktg_graph_data.to_csv('data/ktg_graph_data_delete.csv')
   
   period_dict = initial_values.period_dict
     
