@@ -8,17 +8,22 @@ last_day_of_selection = initial_values.last_day_of_selection
 
 def maintanance_jobs_df_prepare():
   '''подготовка файла со списком работ - основной файл для построения графика простоев'''
-  print('расчет maintanance_jobs_df начат')
+  # print('расчет maintanance_jobs_df начат')
   eo_job_catologue_df = functions.eo_job_catologue_df_func()
   full_eo_list = functions.full_eo_list_func()
+
+  full_eo_list = full_eo_list.loc[full_eo_list['eo_code'] == '100000062398']
+
   # выдергиваем из full_eo_list 'eo_code', 'avearage_day_operation_hours'
   full_eo_list_selected = full_eo_list.loc[:, ['eo_code', 'avearage_day_operation_hours']]
    # джойним с full_eo_list
-  eo_maint_plan_with_dates_with_full_eo_list = pd.merge(eo_job_catologue_df, full_eo_list_selected, on='eo_code',
-                                                          how='left')
+  print(full_eo_list_selected)
+  eo_maint_plan_with_dates_with_full_eo_list = pd.merge(full_eo_list_selected, eo_job_catologue_df, on='eo_code', how='left')
 
-  # джйоним с файлом last_maint_date - датами проведени последней формы.
-  # принимаем, что дата последней формы - это дата начала эксплуатации. От этой даты начинаем отсчет
+  # eo_maint_plan_with_dates_with_full_eo_list.to_csv('data/eo_maint_plan_with_dates_with_full_eo_list_delete.csv')
+  
+  # джйоним с файлом last_maint_date - датами проведения последней формы.
+
   last_maint_date = functions.last_maint_date_func()
   eo_maint_plan = pd.merge(eo_maint_plan_with_dates_with_full_eo_list, last_maint_date, on='eo_maintanance_job_code',
                              how='left')
@@ -33,8 +38,12 @@ def maintanance_jobs_df_prepare():
     eo_code = getattr(row, "eo_code")
     standard_interval_motohours = float(getattr(row, "interval_motohours"))
     plan_downtime = getattr(row, "downtime_planned")
-    start_point = getattr(row, "last_maintanance_date")
     operation_start_date = getattr(row, "operation_start_date")
+    if initial_values.initial_start_status == "operation_start_date":
+      start_point = operation_start_date
+    else:
+      start_point =initial_values.start_point
+  
     operation_finish_date = getattr(row, "operation_finish_date")
     avearage_day_operation_hours = float(getattr(row, "avearage_day_operation_hours"))
     maintanance_category_id = getattr(row, "maintanance_category_id")
@@ -82,9 +91,13 @@ def maintanance_jobs_df_prepare():
     eo_code = getattr(row, "eo_code")
     standard_interval_motohours = float(getattr(row, "interval_motohours"))
     plan_downtime = getattr(row, "downtime_planned")
-    start_point = getattr(row, "last_maintanance_date")
     operation_start_date = getattr(row, "operation_start_date")
     operation_finish_date = getattr(row, "operation_finish_date")
+    if initial_values.initial_start_status == "operation_start_date":
+      start_point = operation_start_date
+    else:
+      start_point =initial_values.start_point
+    
     avearage_day_operation_hours = float(getattr(row, "avearage_day_operation_hours"))
     maintanance_category_id = getattr(row, "maintanance_category_id")
     maintanance_name = getattr(row, "maintanance_name")
@@ -146,9 +159,13 @@ def maintanance_jobs_df_prepare():
     eo_code = getattr(row, "eo_code")
     standard_interval_motohours = float(getattr(row, "interval_motohours"))
     plan_downtime = getattr(row, "downtime_planned")
-    start_point = getattr(row, "last_maintanance_date")
     operation_start_date = getattr(row, "operation_start_date")
     operation_finish_date = getattr(row, "operation_finish_date")
+    if initial_values.initial_start_status == "operation_start_date":
+      start_point = operation_start_date
+    else:
+      start_point =initial_values.start_point
+
     avearage_day_operation_hours = float(getattr(row, "avearage_day_operation_hours"))
     maintanance_category_id = getattr(row, "maintanance_category_id")
     maintanance_name = getattr(row, "maintanance_name")
@@ -199,6 +216,8 @@ def maintanance_jobs_df_prepare():
   # maintanance_jobs_ierarhy_df.to_csv('data/maintanance_jobs_ierarhy_df_full_list_delete.csv')
   maintanance_jobs_df = pd.concat([maintanance_jobs_eto_df, maintanance_jobs_no_ierarhy_df, maintanance_jobs_ierarhy_df], ignore_index=True)
   maintanance_jobs_df.sort_values(by=['maintanance_start_datetime'], inplace = True)
+  
+  # maintanance_jobs_df.to_csv('data/maintanance_jobs_df_before_cut.csv')
   # режем то, что получилось в период три года
   maintanance_jobs_df = maintanance_jobs_df.loc[
       maintanance_jobs_df['maintanance_start_datetime'] >= first_day_of_selection]
@@ -246,4 +265,4 @@ def maintanance_jobs_df_prepare():
   # print("расчет maintanance_jobs_df завершен")
   return maintanance_jobs_df
 
-# maintanance_jobs_df_prepare()
+maintanance_jobs_df_prepare()
