@@ -154,13 +154,21 @@ def maintanance_category_prep():
 
 #############################################################################################
 def select_eo_for_calculation():
-    """Выборка ео из полного списка full_eo_list_actual в full_eo_list"""
-    full_eo_list_actual_df = full_eo_list_actual_func()
+  """Выборка ео из полного списка full_eo_list_actual в full_eo_list"""
+  maintanance_job_list_general_df = maintanance_job_list_general_func()
+  
+  strategy_list = list(set( maintanance_job_list_general_df['strategy_id']))
 
-    strategy_list_df = pd.read_csv('data/strategy_list.csv')
-    strategy_list = strategy_list_df['strategy_id'].unique()
-    eo_list_for_calculation = full_eo_list_actual_df.loc[full_eo_list_actual_df['strategy_id'].isin(strategy_list)]
-    eo_list_for_calculation.to_csv('data/full_eo_list.csv', index=False)
+  full_eo_list = full_eo_list_actual_func()
+  full_eo_list['strategy_id'] = full_eo_list['strategy_id'].astype(int)
+  maintanance_job_list_general_df['strategy_id'] = maintanance_job_list_general_df['strategy_id'].astype(int)
+    
+  full_eo_list = full_eo_list.loc[full_eo_list['strategy_id'].isin(strategy_list)]
+  full_eo_list.to_csv('data/full_eo_list.csv', index=False)
+  return full_eo_list
+  #################
+#select_eo_for_calculation()
+    
 
 
 #####################################################################################################
@@ -168,12 +176,16 @@ def eo_job_catologue():
     '''создание файла eo_job_catologue: список оборудование - работа на оборудовании'''
     # Джойним список машин из full_eo_list c планом ТО из maintanance_job_list_general
     maintanance_job_list_general_df = maintanance_job_list_general_func()
-
+    strategy_list = list(set( maintanance_job_list_general_df['strategy_id']))
     maintanance_job_list_general_df.rename(columns={'upper_level_tehmesto_code': 'level_upper'}, inplace=True)
-    full_eo_list = full_eo_list_func()
+    full_eo_list = full_eo_list_actual_func()
+    full_eo_list['strategy_id'] = full_eo_list['strategy_id'].astype(int)
+    maintanance_job_list_general_df['strategy_id'] = maintanance_job_list_general_df['strategy_id'].astype(int)
+    
+    full_eo_list = full_eo_list.loc[full_eo_list['strategy_id'].isin(strategy_list)]
     eo_maintanance_plan_df = pd.merge(full_eo_list, maintanance_job_list_general_df, on='strategy_id', how='inner')
 
-    # eo_maintanance_plan_df.to_csv('data/eo_maintanance_plan_df_delete.csv')
+    eo_maintanance_plan_df.to_csv('data/eo_maintanance_plan_df_delete.csv')
 
     # удаляем строки, в которых нет данных в колонке eo_main_class_code
     eo_maintanance_plan_df = eo_maintanance_plan_df.loc[eo_maintanance_plan_df['eo_main_class_code'] != 'no_data']
@@ -219,6 +231,7 @@ def eo_job_catologue():
 
     return eo_job_catologue
 
+# eo_job_catologue()
 
 
 # заполняем календарный фонд по оборудованию

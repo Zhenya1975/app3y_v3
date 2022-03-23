@@ -6,6 +6,7 @@ import dash_bootstrap_components as dbc
 
 import initial_values
 import functions
+import json
 
 # select the Bootstrap stylesheet2 and figure template2 for the theme toggle here:
 # template_theme1 = "sketchy"
@@ -173,6 +174,9 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
   ktg_2023 = ktg_year_data.loc[ktg_year_data['year']==2023].iloc[0]['ktg']
   ktg_2024 = ktg_year_data.loc[ktg_year_data['year']==2024].iloc[0]['ktg']
   ktg_2025 = ktg_year_data.loc[ktg_year_data['year']==2025].iloc[0]['ktg']
+
+  
+
   
   
   return fig_downtime, fig_ktg, ktg_table_df, ktg_2023, ktg_2024, ktg_2025

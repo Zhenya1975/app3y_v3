@@ -10,6 +10,7 @@ import tab_main
 import settings_tab
 import functions
 import func_maintanance_jobs_df_prepare
+import func_ktg_data_prep
 
 
 import widget_fig_piechart_downtime_2023
@@ -191,6 +192,7 @@ def maintanance(theme_selector, checklist_be):
  
   # если фильтр не трогали и его значение равно None, то вытаскиваем значение из сохраненного фильтра
   be_full_list = func_be_select_data_prep.be_select_data_prep()[2]
+
   
   if checklist_be == None:
     checklist_be_value = saved_filters_dict['filter_be']
@@ -328,6 +330,9 @@ def funct(n_clicks_ktg_table):
 def funct_maintanance_job_list_general_calc(n_clicks_maintanance_jobs_df_calc):
   message_result = ""
   if n_clicks_maintanance_jobs_df_calc:
+    functions.maintanance_category_prep()
+    functions.select_eo_for_calculation()
+    functions.eo_job_catologue()
     func_maintanance_jobs_df_prepare.maintanance_jobs_df_prepare()
     # читаем результат
     maintanance_jobs_df = functions.maintanance_jobs_df()

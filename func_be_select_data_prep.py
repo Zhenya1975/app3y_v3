@@ -8,7 +8,7 @@ def be_select_data_prep():
     saved_filters_dict = json.load(openfile)
   # print("saved_filters_dict", saved_filters_dict)
   
-  ktg_by_month_data_df = pd.read_csv('data/ktg_by_month_data_df.csv', decimal = ",")
+  ktg_by_month_data_df = pd.read_csv('widget_data/ktg_by_month_data_df.csv', decimal = ",")
   be_list = list(set(ktg_by_month_data_df['level_1']))
  
   level_1_df = pd.read_csv('data/level_1.csv')

@@ -11,8 +11,9 @@ def maintanance_jobs_df_prepare():
   # print('расчет maintanance_jobs_df начат')
   eo_job_catologue_df = functions.eo_job_catologue_df_func()
   full_eo_list = functions.full_eo_list_func()
-
-  full_eo_list = full_eo_list.loc[full_eo_list['eo_code'] == '100000062398']
+  
+  
+  full_eo_list = full_eo_list.loc[full_eo_list['eo_code'].isin(['100000062398', '100000008673'])]
 
   # выдергиваем из full_eo_list 'eo_code', 'avearage_day_operation_hours'
   full_eo_list_selected = full_eo_list.loc[:, ['eo_code', 'avearage_day_operation_hours']]
