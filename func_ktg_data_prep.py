@@ -115,14 +115,14 @@ def ktg_data_prep():
       
     # заполняем пустые ячейки нулями
     hour_df.fillna(0, inplace=True)
-    print(hour_df.columns)
+    # print(hour_df.columns)
     hour_df.to_csv('data/hour_df_temp_delete.csv')  
     job_list = list(pd.read_csv('data/job_list.csv')['maintanance_category_id'])
     # hour_df.to_csv('data/hour_df_delete.csv')
     print(hour_df.columns)
 
     columns = ['calendar_fond', 'downtime', 'eto'] + maint_category_list
-    print("columns", columns)
+    # print("columns", columns)
     eo_calendar_fond_downtime_by_month = hour_df.groupby(['year', 'month'], as_index=False)[columns].sum()
     
     
@@ -148,5 +148,5 @@ def ktg_data_prep():
 
 
 
-ktg_data_prep()
+# ktg_data_prep()
 
