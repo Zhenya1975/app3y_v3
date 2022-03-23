@@ -17,7 +17,7 @@ def maintanance_jobs_df_prepare():
   # выдергиваем из full_eo_list 'eo_code', 'avearage_day_operation_hours'
   full_eo_list_selected = full_eo_list.loc[:, ['eo_code', 'avearage_day_operation_hours']]
    # джойним с full_eo_list
-  print(full_eo_list_selected)
+
   eo_maint_plan_with_dates_with_full_eo_list = pd.merge(full_eo_list_selected, eo_job_catologue_df, on='eo_code', how='left')
 
   # eo_maint_plan_with_dates_with_full_eo_list.to_csv('data/eo_maint_plan_with_dates_with_full_eo_list_delete.csv')
@@ -263,6 +263,10 @@ def maintanance_jobs_df_prepare():
   # print(len(maintanance_jobs_df))
   # maintanance_jobs_df.to_csv('data/maintanance_jobs_df_full_list_delete.csv')
   # print("расчет maintanance_jobs_df завершен")
+
+  job_list = ['eto'] + list(set(maintanance_jobs_df['maintanance_category_id']))
+  job_list_df = pd.DataFrame(job_list, columns = ['maintanance_category_id'])
+  job_list_df.to_csv('data/job_list.csv', index = False)
   return maintanance_jobs_df
 
-maintanance_jobs_df_prepare()
+# maintanance_jobs_df_prepare()
