@@ -144,6 +144,8 @@ app.layout = dbc.Container(
     Output('eo_qty_2023', 'children'),
     Output('eo_qty_2024', 'children'),
     Output('eo_qty_2025', 'children'),
+    Output('ktg_2023', 'children'),
+  
     Output('planned_downtime', 'figure'),
     Output('fig_ktg_3y_by_months_id', 'figure'),
     
@@ -228,6 +230,10 @@ def maintanance(theme_selector, checklist_be):
   eo_qty_2024_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2024)
   eo_qty_2025_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2025)
 
+
+  ktg_2023_text = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[3]
+  
+  ktg_2023_card_text = 'КТГ по году: {}'.format(ktg_2023_text)
   # fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector, be_list_for_dataframes_filtering)
   fig_ktg = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[1]
   # df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
@@ -242,7 +248,7 @@ def maintanance(theme_selector, checklist_be):
 
   
   new_loading_style = loading_style
-  return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, ktg_by_month_table, new_loading_style
+  return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, ktg_2023_card_text, fig_downtime, fig_ktg, ktg_by_month_table, new_loading_style
 
 
 
