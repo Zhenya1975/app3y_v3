@@ -22,6 +22,7 @@ import func_graph_downtime_data_prep
 import widget_table_ktg
 import widget_download_eo
 import widget_download_maint_jobs
+import widgets
 
 # import tab_coverage
 # import tab_settings
@@ -146,9 +147,7 @@ app.layout = dbc.Container(
     Output('eo_qty_2025', 'children'),
     Output('planned_downtime', 'figure'),
     Output('fig_ktg_3y_by_months_id', 'figure'),
-    Output('planned_downtime_piechart_2023', 'figure'),
-    Output('planned_downtime_piechart_2024', 'figure'),
-    Output('planned_downtime_piechart_2025', 'figure'),
+    
 
     Output('ktg_by_month_table', 'children'),
     Output('loading', 'parent_style'),
@@ -234,8 +233,9 @@ def maintanance(theme_selector, checklist_be):
 
   # таким образом, мы получили значение из фильтра be и теперь можем отфильтровать данные для виджетов
   
-  fig_downtime_data = func_graph_downtime_data_prep.graph_downtime_data_prep(be_list_for_dataframes_filtering)
-  fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector, fig_downtime_data)
+  # fig_downtime_data = func_graph_downtime_data_prep.graph_downtime_data_prep(be_list_for_dataframes_filtering)
+  # fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector, fig_downtime_data)
+  fig_downtime = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)
 
   total_qty_EO_2023 = functions.total_qty_EO(be_list_for_dataframes_filtering)[0]
   total_qty_EO_2024 = functions.total_qty_EO(be_list_for_dataframes_filtering)[1]
@@ -256,12 +256,9 @@ def maintanance(theme_selector, checklist_be):
   # обновить csv для выгрузки данных о работах
   widget_download_maint_jobs.maint_jobs_download_preparation(be_list_for_dataframes_filtering)
 
-  fig_piechart_downtime_2023 = widget_fig_piechart_downtime_2023.fig_piechart_downtime_2023(theme_selector, be_list_for_dataframes_filtering)
-  fig_piechart_downtime_2024 = widget_fig_piechart_downtime_2024.fig_piechart_downtime_2024(theme_selector, be_list_for_dataframes_filtering)
-  fig_piechart_downtime_2025 = widget_fig_piechart_downtime_2025.fig_piechart_downtime_2025(theme_selector, be_list_for_dataframes_filtering)
   
   new_loading_style = loading_style
-  return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, fig_piechart_downtime_2023, fig_piechart_downtime_2024, fig_piechart_downtime_2025, ktg_by_month_table, new_loading_style
+  return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, fig_downtime, fig_ktg, ktg_by_month_table, new_loading_style
 
 
 

@@ -131,7 +131,7 @@ def ktg_data_prep():
   eo_data = full_eo_list.loc[:, ['eo_code', 'level_1', 'eo_model_name', 'eo_description', 'teh_mesto', 'mvz', 'constr_type', 'avearage_day_operation_hours_updated', 'operation_start_date', 'avearage_day_operation_hours',	'operation_finish_date', 'eo_main_class_description']]
   ktg_by_month_data_df = pd.merge(ktg_by_month_data_df, eo_data, how='left', on='eo_code')
   # print("после объединения с full eo list")
-  ktg_by_month_data_df.to_csv('data/ktg_by_month_data_df.csv', decimal=",", index=False)
+  ktg_by_month_data_df.to_csv('widget_data/ktg_by_month_data_df.csv', decimal=",", index=False)
   # пересчитываем csv графика простоев
   # print("перед пересчетом графиика простоев")
   # func_graph_downtime_data_prep.graph_downtime_data_prep()
@@ -143,6 +143,6 @@ def ktg_data_prep():
 
 
 
-ktg_data_prep()
+# ktg_data_prep()
 
 
