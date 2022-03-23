@@ -166,14 +166,16 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
 
   ############## РАСЧЕТ ГОДОВОГО КТГ #################################
   ktg_year_data = ktg_by_month_data_filtered.groupby(['year'], as_index=False)[['calendar_fond','downtime']].sum()
+
   ktg_year_data['ktg'] = (ktg_year_data['calendar_fond'] - ktg_year_data['downtime']) / ktg_year_data['calendar_fond']
   ktg_year_data['ktg'] = ktg_year_data['ktg'].apply(lambda x: round(x, 2))
-  ktg_2023 = str(ktg_year_data.loc[ktg_year_data['year']==2023, 'ktg'][0])
-  # ktg_2024 = str(ktg_year_data.loc[ktg_year_data['year']==2024, 'ktg'][0])
-  # ktg_2025 = str(ktg_year_data.loc[ktg_year_data['year']==2025, 'ktg'][0])
-  print(ktg_2023)
+
+  ktg_2023 = ktg_year_data.loc[ktg_year_data['year']==2023].iloc[0]['ktg']
+  ktg_2024 = ktg_year_data.loc[ktg_year_data['year']==2024].iloc[0]['ktg']
+  ktg_2025 = ktg_year_data.loc[ktg_year_data['year']==2025].iloc[0]['ktg']
   
-  return fig_downtime, fig_ktg, ktg_table_df, ktg_2023
+  
+  return fig_downtime, fig_ktg, ktg_table_df, ktg_2023, ktg_2024, ktg_2025
   
 
 
