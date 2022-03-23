@@ -10,15 +10,14 @@ import tab_main
 import settings_tab
 import functions
 import func_maintanance_jobs_df_prepare
-import func_ktg_data_prep
-import widget_fig_downtime
+
 import widget_fig_ktg
 import widget_fig_piechart_downtime_2023
 import widget_fig_piechart_downtime_2024
 import widget_fig_piechart_downtime_2025
 import ktg_table_html
 import func_be_select_data_prep
-import func_graph_downtime_data_prep
+
 import widget_table_ktg
 import widget_download_eo
 import widget_download_maint_jobs
@@ -185,23 +184,7 @@ def maintanance(theme_selector, checklist_be):
     
   # maintanance_jobs_df = functions.maintanance_jobs_df()
   
-  # при нажатии на кнопку обновляем csv для построения графиков
-  # if btn_update_n_click:
-  #   # Обновление данных для построения графика
-  #   functions.pass_interval_fill()
-  #   functions.maintanance_category_prep()
-  #   functions.eo_job_catologue()
-  #   func_maintanance_jobs_df_prepare.maintanance_jobs_df_prepare()
-  #   functions.fill_calendar_fond()
-  #   functions.hour_calculation()
-  #   functions.eo_list_download_preparation()
-  #   functions.maint_jobs_download_preparation()
-  #   functions.downtime_by_categiries_data()
-  #   functions.ktg_graph_data_preparation()
-  #   functions.ktg_table_prep()
-  
-  
-
+ 
   # если фильтр не трогали и его значение равно None, то вытаскиваем значение из сохраненного фильтра
   be_full_list = func_be_select_data_prep.be_select_data_prep()[2]
   
@@ -235,7 +218,7 @@ def maintanance(theme_selector, checklist_be):
   
   # fig_downtime_data = func_graph_downtime_data_prep.graph_downtime_data_prep(be_list_for_dataframes_filtering)
   # fig_downtime = widget_fig_downtime.fig_downtime_by_years(theme_selector, fig_downtime_data)
-  fig_downtime = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)
+  fig_downtime = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[0]
 
   total_qty_EO_2023 = functions.total_qty_EO(be_list_for_dataframes_filtering)[0]
   total_qty_EO_2024 = functions.total_qty_EO(be_list_for_dataframes_filtering)[1]
@@ -245,8 +228,8 @@ def maintanance(theme_selector, checklist_be):
   eo_qty_2024_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2024)
   eo_qty_2025_card_text = 'Кол-во ЕО в выборке: {}'.format(total_qty_EO_2025)
 
-  fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector, be_list_for_dataframes_filtering)
-
+  # fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector, be_list_for_dataframes_filtering)
+  fig_ktg = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[1]
   # df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
   df_ktg_table = widget_table_ktg.ktg_table_prep(be_list_for_dataframes_filtering)
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)

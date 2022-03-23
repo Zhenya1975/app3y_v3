@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 from dash_bootstrap_templates import ThemeSwitchAIO
 from dash_bootstrap_templates import load_figure_template
 import dash_bootstrap_components as dbc
-import func_graph_downtime_data_prep
+
 import initial_values
 import functions
 
@@ -44,22 +44,25 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
   ktg_by_month_data_filtered = ktg_by_month_data.loc[ktg_by_month_data['level_1'].isin(be_list_for_dataframes_filtering)]
   ktg_by_month_data_filtered['month_year'] = ktg_by_month_data_filtered['month'].astype(str) + "_" + ktg_by_month_data_filtered['year'].astype(str)
   
-  downtime_graph_data = ktg_by_month_data_filtered.groupby(['month_year'], as_index=False)['downtime'].sum()
-  
+  downtime_ktg_graph_data = ktg_by_month_data_filtered.groupby(['month_year'], as_index=False)[['calendar_fond','downtime']].sum()
+  downtime_ktg_graph_data['ktg'] = (downtime_ktg_graph_data['calendar_fond'] - downtime_ktg_graph_data['downtime']) / downtime_ktg_graph_data['calendar_fond']
+  downtime_ktg_graph_data['downtime'] = downtime_ktg_graph_data['downtime'].apply(lambda x: round(x, 0))
+  downtime_ktg_graph_data['ktg'] = downtime_ktg_graph_data['ktg'].apply(lambda x: round(x, 2))
   period_dict = initial_values.period_dict
     
   period_sort_index = initial_values.period_sort_index
   
-  downtime_graph_data['period'] = downtime_graph_data['month_year'].map(period_dict).astype(str)
+  downtime_ktg_graph_data['period'] = downtime_ktg_graph_data['month_year'].map(period_dict).astype(str)
   
-  downtime_graph_data['period_sort_index'] = downtime_graph_data['month_year'].map(period_sort_index)
-  downtime_graph_data.sort_values(by='period_sort_index', inplace = True)
+  downtime_ktg_graph_data['period_sort_index'] = downtime_ktg_graph_data['month_year'].map(period_sort_index)
+  downtime_ktg_graph_data.sort_values(by='period_sort_index', inplace = True)
   
   # downtime_graph_data['downtime'] = downtime_graph_data['downtime'].astype(int)
   # ktg_graph_data['downtime'] = ktg_graph_data['downtime'].apply(lambda x: round(x, 0))
   
-  downtime_graph_data.rename(columns={'period': 'Период', 'downtime': "Запланированный простой, час"}, inplace=True)
-  downtime_graph_data = downtime_graph_data.loc[:, ['Период', 'Запланированный простой, час']]
+  downtime_ktg_graph_data.rename(columns={'period': 'Период', 'downtime': "Запланированный простой, час", "ktg": "КТГ"}, inplace=True)
+
+  downtime_graph_data = downtime_ktg_graph_data.loc[:, ['Период', 'Запланированный простой, час']]
 
   x_month_year = downtime_graph_data['Период']
   y_downtime = downtime_graph_data['Запланированный простой, час']
@@ -98,8 +101,40 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
     title_text='Запланированный простой по месяцам за 3 года, час',
     template=graph_template,
     )
+  
+  ########################### ГРАФИК КТГ ###############################
+  ktg_graph_data = downtime_ktg_graph_data.loc[:, ['Период', 'КТГ']]
+  x_month_year_ktg = ktg_graph_data['Период']
+  y_ktg = ktg_graph_data['КТГ']
+  text_list_ktg_month_year = ktg_graph_data['КТГ']
+  fig_ktg = go.Figure()
+  fig_ktg.add_trace(go.Bar(
+    name="КТГ",
+    x=x_month_year_ktg, 
+    y=y_ktg,
+    # xperiod="M1",
+    # xperiodalignment="middle",
+    #textposition='auto'
+    ))
+  # new_year_2022_2023 = pd.to_datetime('01.01.2024', format='%d.%m.%Y')
+  # new_year_2023_2024 = pd.to_datetime('01.01.2025', format='%d.%m.%Y')
+  # fig_downtime.add_vline(x=new_year_2022_2023, line_width=3, line_color="green")
+  # fig_downtime.add_vline(x=new_year_2023_2024, line_width=3, line_color="green")
 
-  return fig_downtime
+  fig_ktg.update_xaxes(
+    showgrid=False, 
+    # ticklabelmode="period"
+  )
+  fig_ktg.update_traces(
+    text = text_list_ktg_month_year,
+    textposition='auto'
+  )
+  fig_ktg.update_layout(
+    title_text='Запланированный КТГ по месяцам за 3 года',
+    template=graph_template,
+    )
+  
+  return fig_downtime, fig_ktg
 
   
   
