@@ -90,10 +90,13 @@ def ktg_data_prep():
     # записываем единички в простои, не равные ето
     maint_df = maintanance_jobs_df_selected_by_eo.loc[maintanance_jobs_df_selected_by_eo['maintanance_category_id'] != "eto"]
     # print(maint_df)
+    maint_category_list = []
     for row in maint_df.itertuples():
       maintanance_jobs_id = getattr(row, "maintanance_jobs_id")
       maintanance_name = getattr(row, "maintanance_name")
       maintanance_category_id = getattr(row, "maintanance_category_id")
+      if maintanance_category_id not in maint_category_list:
+        maint_category_list.append(maintanance_category_id)
       maintanance_start_datetime = getattr(row, "maintanance_start_datetime")
       maintanance_finish_datetime = getattr(row, "maintanance_finish_datetime")
       downtime_plan = getattr(row, "downtime_plan")
@@ -114,8 +117,12 @@ def ktg_data_prep():
     hour_df.fillna(0, inplace=True)
     # hour_df.to_csv('data/hour_df_temp_delete.csv')  
     job_list = list(pd.read_csv('data/job_list.csv')['maintanance_category_id'])
+    # hour_df.to_csv('data/hour_df_delete.csv')
+    print(hour_df.columns)
 
-    eo_calendar_fond_downtime_by_month = hour_df.groupby(['year', 'month'], as_index=False)[column_list].sum()
+    columns = ['calendar_fond', 'downtime'] + maint_category_list
+    print("columns", columns)
+    eo_calendar_fond_downtime_by_month = hour_df.groupby(['year', 'month'], as_index=False)[columns].sum()
     
     
     eo_calendar_fond_downtime_by_month['eo_code'] = eo
@@ -137,9 +144,6 @@ def ktg_data_prep():
   # func_graph_downtime_data_prep.graph_downtime_data_prep()
   # пересчитываем данные для списка фильтра БЕ
   # func_be_select_data_prep.be_select_data_prep()
-
-
-  
 
 
 

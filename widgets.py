@@ -42,8 +42,14 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
   # данные о простоях и календарном фонде
   ktg_by_month_data = pd.read_csv('widget_data/ktg_by_month_data_df.csv', decimal = ",")
   # режем по фильтру
+  
+  
+  
   ktg_by_month_data_filtered = ktg_by_month_data.loc[ktg_by_month_data['level_1'].isin(be_list_for_dataframes_filtering)]
+  ktg_by_month_data_filtered = ktg_by_month_data_filtered.copy()
   ktg_by_month_data_filtered['month_year'] = ktg_by_month_data_filtered['month'].astype(str) + "_" + ktg_by_month_data_filtered['year'].astype(str)
+  
+  # ktg_by_month_data_filtered.loc[:, ['month_year']] = ktg_by_month_data_filtered.loc[:, ['month']].astype(str) + "_" + ktg_by_month_data_filtered.loc[:, ['year']].astype(str)
 
   ########### ГРУППИРОВКА  #####################
   downtime_ktg_graph_data = ktg_by_month_data_filtered.groupby(['month_year', 'eo_model_name'], as_index=False)[['calendar_fond','downtime']].sum()
