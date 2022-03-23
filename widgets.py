@@ -43,8 +43,11 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
   # режем по фильтру
   ktg_by_month_data_filtered = ktg_by_month_data.loc[ktg_by_month_data['level_1'].isin(be_list_for_dataframes_filtering)]
   ktg_by_month_data_filtered['month_year'] = ktg_by_month_data_filtered['month'].astype(str) + "_" + ktg_by_month_data_filtered['year'].astype(str)
+
+  ########### ГРУППИРОВКА  #####################
+  downtime_ktg_graph_data = ktg_by_month_data_filtered.groupby(['month_year', 'eo_model_name'], as_index=False)[['calendar_fond','downtime']].sum()
+
   
-  downtime_ktg_graph_data = ktg_by_month_data_filtered.groupby(['month_year'], as_index=False)[['calendar_fond','downtime']].sum()
   downtime_ktg_graph_data['ktg'] = (downtime_ktg_graph_data['calendar_fond'] - downtime_ktg_graph_data['downtime']) / downtime_ktg_graph_data['calendar_fond']
   downtime_ktg_graph_data['downtime'] = downtime_ktg_graph_data['downtime'].apply(lambda x: round(x, 0))
   downtime_ktg_graph_data['ktg'] = downtime_ktg_graph_data['ktg'].apply(lambda x: round(x, 2))
@@ -56,7 +59,7 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
   
   downtime_ktg_graph_data['period_sort_index'] = downtime_ktg_graph_data['month_year'].map(period_sort_index)
   downtime_ktg_graph_data.sort_values(by='period_sort_index', inplace = True)
-  
+
   # downtime_graph_data['downtime'] = downtime_graph_data['downtime'].astype(int)
   # ktg_graph_data['downtime'] = ktg_graph_data['downtime'].apply(lambda x: round(x, 0))
   
@@ -133,10 +136,37 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
     title_text='Запланированный КТГ по месяцам за 3 года',
     template=graph_template,
     )
+
+  ############################ ТАБЛИЦА КТГ ##############################
+
+  eo_model_list = list(set(downtime_ktg_graph_data['eo_model_name']))
+  columns_list = initial_values.months_list
+  columns_list = ['Модель ЕО'] + columns_list
+  index_list = eo_model_list
+  ktg_table_df = pd.DataFrame(columns=columns_list, index=index_list)
+  # Сначала внешним циклом итерируемся по строкам таблицы - то есть по списку моделей ео
+  for eo_model in eo_model_list:
+    temp_dict = {}
+    # делаем срез  - все записи текущей модели ео
+    ktg_graph_data_selected = downtime_ktg_graph_data.loc[downtime_ktg_graph_data['eo_model_name'] == eo_model]
+    
+    temp_dict['Модель ЕО'] = eo_model
+    # итерируемся по полученном временном срезу по модели
+    for row in ktg_graph_data_selected.itertuples():
+      month_year = getattr(row, 'month_year')
+      ktg = getattr(row, 'КТГ')
+      temp_dict[month_year] = ktg
+    ktg_table_df.loc[eo_model] = pd.Series(temp_dict)
+    
+  ktg_table_df = ktg_table_df.rename(columns = initial_values.period_dict)
+  ktg_table_df.index.name = 'Наименование модели ЕО'
+  ktg_table_df.fillna(0, inplace = True)
+  # ktg_table_df['Наименование модели'] = ktg_table_df.index
+  ktg_table_df.to_csv('widget_data/ktg_table_data.csv', index = False)
   
-  return fig_downtime, fig_ktg
+  return fig_downtime, fig_ktg, ktg_table_df
 
   
   
 
-# widgets_data(['first11'])
+widgets_data(True, ['first11'])

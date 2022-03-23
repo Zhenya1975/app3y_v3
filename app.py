@@ -11,7 +11,7 @@ import settings_tab
 import functions
 import func_maintanance_jobs_df_prepare
 
-import widget_fig_ktg
+
 import widget_fig_piechart_downtime_2023
 import widget_fig_piechart_downtime_2024
 import widget_fig_piechart_downtime_2025
@@ -231,7 +231,8 @@ def maintanance(theme_selector, checklist_be):
   # fig_ktg = widget_fig_ktg.fig_ktg_by_years(theme_selector, be_list_for_dataframes_filtering)
   fig_ktg = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[1]
   # df_ktg_table = pd.read_csv('widget_data/ktg_table_data.csv')
-  df_ktg_table = widget_table_ktg.ktg_table_prep(be_list_for_dataframes_filtering)
+  # df_ktg_table = widget_table_ktg.ktg_table_prep(be_list_for_dataframes_filtering)
+  df_ktg_table = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[2]
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
   # обновить csv для выгрузки eo
