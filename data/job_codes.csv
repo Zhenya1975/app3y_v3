@@ -1,0 +1,14 @@
+maintanance_category_id,maintanance_name,maintanance_category_sort_index
+eto,ЕТО,500
+overhaul_total,КР,1600
+to1000,ТО-1000,700
+to12000,ТО-12000,1100
+to2000,ТО-2000,800
+to4000,ТО-4000,900
+to500,ТО-500,600
+to6000,ТО-6000,1000
+to_suppl_systems,ТО доп систем,1400
+tr,ТР,1200
+tr_middle,Трсред,1300
+tr_suppl_systems,Трдоп.сист.,1400
+tyre_repl,Замена колес (6 шт),1500

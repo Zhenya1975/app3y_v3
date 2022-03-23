@@ -7,7 +7,9 @@ def ktg_table(df):
 
         dash_table.DataTable(
             data=df.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in df.columns],
+         
+            # columns=[{'name': i, 'id': i} for i in df.columns],
+            columns=[{'name': str(i), 'id': str(i)} for i in df.columns],
             # filter_action='native',
             style_header={
                 # 'backgroundColor': 'white',

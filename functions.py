@@ -455,9 +455,18 @@ def downtime_by_categiries_data():
 
   return downtime_by_catagories_2023_data, downtime_by_catagories_2024_data, downtime_by_catagories_2025_data
   
+def job_codes_prep():
+  """обработка кодов работ из maintanance_job_list_general"""
+  maintanance_job_list_general = maintanance_job_list_general_func()
+  
+  job_codes_df = maintanance_job_list_general.groupby(['maintanance_category_id',	'maintanance_name',	'maintanance_category_sort_index'], as_index = False)['strategy_id'].sum()
+  job_codes_df = job_codes_df.loc[:, ['maintanance_category_id',	'maintanance_name',	'maintanance_category_sort_index']]
+  job_codes_df.to_csv('data/job_codes.csv', index = False)
+
 
 
 ################# ЗАПУСК ФУНКЦИЙ #############################
+
 
 
 # full_eo_list_actual_func()

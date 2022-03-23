@@ -154,6 +154,8 @@ app.layout = dbc.Container(
     
 
     Output('ktg_by_month_table', 'children'),
+    Output('p11_table', 'children'),
+  
     Output('loading', 'parent_style'),
 
 ],
@@ -251,6 +253,9 @@ def maintanance(theme_selector, checklist_be):
   df_ktg_table = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[2]
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
+  df_p11_table = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[6]
+  p11_table = ktg_table_html.ktg_table(df_p11_table)
+
   # обновить csv для выгрузки eo
   widget_download_eo.eo_list_download_preparation(be_list_for_dataframes_filtering)
   # обновить csv для выгрузки данных о работах
@@ -258,7 +263,7 @@ def maintanance(theme_selector, checklist_be):
 
   
   new_loading_style = loading_style
-  return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, ktg_2023_card_text, ktg_2024_card_text, ktg_2025_card_text, fig_downtime, fig_ktg, ktg_by_month_table, new_loading_style
+  return checklist_be_value, checklist_be_options, eo_qty_2023_card_text,eo_qty_2024_card_text, eo_qty_2025_card_text, ktg_2023_card_text, ktg_2024_card_text, ktg_2025_card_text, fig_downtime, fig_ktg, ktg_by_month_table, p11_table, new_loading_style
 
 
 
@@ -411,6 +416,8 @@ def parse_contents(contents, filename):
               functions.maintanance_category_prep()
               functions.eo_job_catologue()
               print("eo_job_catologue обновлен")
+              functions.job_codes_prep()
+              print("job_codes обновлен")
               
             else:
               print('не хватает колонок')

@@ -181,11 +181,51 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
   ktg_2024 = ktg_year_data.loc[ktg_year_data['year']==2024].iloc[0]['ktg']
   ktg_2025 = ktg_year_data.loc[ktg_year_data['year']==2025].iloc[0]['ktg']
 
+  ############## РАЗВЕРТКА Р11 ###############################
+  ktg_by_month_data_df_columns = ktg_by_month_data_filtered.columns
+  job_list = list(pd.read_csv('data/job_list.csv')['maintanance_category_id'])
+  actual_job_list = list(set(ktg_by_month_data_df_columns).intersection(job_list))
   
+  actual_job_list_df = pd.DataFrame(actual_job_list, columns = ['maintanance_category_sort_index'])
+  
+  job_codes_df = pd.read_csv('data/job_codes.csv')
+  
+  
+ 
+  column_list_groupping = ['downtime'] + actual_job_list
 
+  # группируем в eo_main_class_description
+  p11_raw_data = ktg_by_month_data_filtered.groupby(['eo_main_class_description', 'eo_model_name', 'year', 'month'], as_index = False)[column_list_groupping].sum()
+  # print(p11_raw_data)
+
+  # column_list = ['eo_main_class_description', 'eo_model_name', 'eo_description', 'eo_code', 'eo_description', 'operation_start_date', 'operation_finish_date', 'year', 'month'] + actual_job_list
   
   
-  return fig_downtime, fig_ktg, ktg_table_df, ktg_2023, ktg_2024, ktg_2025
+  # p11_data = ktg_by_month_data_filtered.loc[:, column_list]
+  
+  p11data_transposed = p11_raw_data.transpose()
+  p11data_transposed.reset_index(inplace = True)
+  # print(p11data_transposed.index)
+  # p11data_transposed.columns = p11data_transposed.iloc[0]
+  # p11data_transposed_new = p11data_transposed[1:]
+  # print(p11data_transposed_new.index)
+  # p11data_transposed_new.reset_index(inplace = True)
+  # print(p11data_transposed_new.index)
+  #print(p11_raw_data)
+  #p11_raw_data.reset_index()
+  #print(p11_raw_data)
+  p11data_transposed.to_csv('widget_data/p11data.csv')
+  # p11data_transposed_new.to_csv('widget_data/p11data.csv')
+
+  # p11data_transposed_new.loc[:, ['titles']] = p11data_transposed_new.index
+  
+  # print(list(p11data_transposed_new.index))
+  # data=p11data_transposed_new.to_dict('records')
+  # print(data)
+  # p11data_transposed_new['titles'] = p11data_transposed_new.index
+  # print(p11data_transposed_new.index)
+  
+  return fig_downtime, fig_ktg, ktg_table_df, ktg_2023, ktg_2024, ktg_2025, p11data_transposed
   
 
 

@@ -246,8 +246,10 @@ def maintanance_chart_tab():
                        html.Hr(),
                        html.P(),
                       
-                       
-                       html.Div(id='ktg_by_month_table'), 
+                
+                      html.Div(id='ktg_by_month_table'),
+                      html.P(),
+                      html.Div(id='p11_table'),
 
 
 
