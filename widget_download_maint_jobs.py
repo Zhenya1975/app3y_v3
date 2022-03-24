@@ -18,7 +18,7 @@ def maint_jobs_download_preparation(be_list_for_dataframes_filtering):
   maint_jobs_data['downtime_plan'] = maint_jobs_data['downtime_plan'].str.replace('.', ',', regex=False)
  
    # выбираем колонки
-  maint_jobs_data = maint_jobs_data.loc[:, ['level_1_description','eo_class_description','constr_type','teh_mesto',	'mvz','eo_model_name', 'eo_code',	 'eo_description',  'operation_start_date', 'operation_finish_date', 'avearage_day_operation_hours_updated', 'Наработка 1.03.2022', 'maintanance_start_datetime','maintanance_finish_datetime', 'maintanance_name', 'downtime_plan']]
+  maint_jobs_data = maint_jobs_data.loc[:, ['level_1_description','eo_class_description','constr_type','teh_mesto',	'mvz','eo_model_name', 'eo_code',	 'eo_description',  'operation_start_date', 'operation_finish_date', 'avearage_day_operation_hours_updated', 'Наработка 1.03.2022', 'maintanance_start_datetime','maintanance_finish_datetime','year', 'month', 'maintanance_name', 'downtime_plan']]
   # переименовываем колонки
   maint_jobs_data_for_excel = maint_jobs_data.rename(columns= initial_values.rename_columns_dict)
   

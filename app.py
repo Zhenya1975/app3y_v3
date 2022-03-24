@@ -315,6 +315,19 @@ def funct_ktg_table(n_clicks_ktg_table):
     return dcc.send_data_frame(df.to_excel, "КТГ по месяцам.xlsx", index=False, sheet_name="КТГ по месяцам")
 
 
+    ####################### ОБРАБОТЧИК ВЫГРУЗКИ P11 В EXCEL #####################################
+@app.callback(
+    Output("download_excel_p11_table", "data"),
+    Input("btn_download_p11_table", "n_clicks"),
+    prevent_initial_call=True,)
+def funct_p11_table(n_clicks_p11_table):
+  # df = pd.read_csv('widget_data/eo_download_data.csv', dtype = str)
+  df = pd.read_csv('widget_data/p11data.csv', dtype = str, decimal=",")
+  df.columns = df.iloc[0]
+  df_new = df[1:]
+
+  if n_clicks_p11_table:
+    return dcc.send_data_frame(df_new.to_excel, "Простой по месяцам.xlsx", index=False, sheet_name="Простой по месяцам")
 
 ########## Настройки################
 

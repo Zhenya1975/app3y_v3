@@ -217,7 +217,7 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
   #print(p11_raw_data)
   #p11_raw_data.reset_index()
   #print(p11_raw_data)
-  p11data_transposed.to_csv('widget_data/p11data.csv')
+  p11data_transposed.to_csv('widget_data/p11data.csv', index = False)
   # p11data_transposed_new.to_csv('widget_data/p11data.csv')
 
   # p11data_transposed_new.loc[:, ['titles']] = p11data_transposed_new.index

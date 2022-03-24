@@ -189,9 +189,15 @@ def maintanance_chart_tab():
                                  ),
                           dbc.Col(width=2,
                                   children=[
-                                    
+                                    html.Div([
+                                      dbc.Button("Выгрузить простои Виды воздейств./ месяцы года, xlsx", id="btn_download_p11_table", size="sm",
+                                                 style={'marginBottom': '3px',
+                                                        'marginTop': '3px',
+                                                        'backgroundColor': '#232632'},),
+                                      dcc.Download(id="download_excel_p11_table")
+                                    ])
                                   ]
-                                 )
+                                 ),
                         ])
                       ),
 
