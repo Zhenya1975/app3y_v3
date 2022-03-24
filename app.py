@@ -339,7 +339,7 @@ def funct_p11_table(n_clicks_p11_table):
 def funct(n_clicks_ktg_table):
   df = pd.read_csv('data/maintanance_job_list_general.csv')
   if n_clicks_ktg_table:
-    return dcc.send_data_frame(df.to_excel, "maintanance_job_list.xlsx", index=False, sheet_name="maintanance_job_list")
+    return dcc.send_data_frame(df.to_excel, "maintanance_job_list_general.xlsx", index=False, sheet_name="maintanance_job_list_general")
 
 # Обработчик кнопки расчета maintanance_jobs_df
 @app.callback(

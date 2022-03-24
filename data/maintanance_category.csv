@@ -12,3 +12,16 @@ tr_suppl_systems,Трдоп.сист.
 tr_middle,Трсред
 overhaul_total,КР
 tyre_repl,Замена колес (6 шт)
+to250,ТО1-250
+to1500,ТО4-1500
+to2500,ТО6-2500
+to5000,ТО8-5000
+to8000,ТО9-8000
+to10000,ТО10-10000
+eng_repl,Кдвс (Замена)
+gen_overhaul,Кген(Замена)
+kmk_overhaul,Кмк (Замена)
+tr_mo,ТРмо (Замена)
+tr_susp,ТР Подвески
+lining_partitial,СВч (частичная футеровка)
+lining_full,СВп (полная футеровка)
