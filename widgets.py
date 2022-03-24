@@ -196,6 +196,9 @@ def widgets_data(theme_selector, be_list_for_dataframes_filtering):
 
   # группируем в eo_main_class_description
   p11_raw_data = ktg_by_month_data_filtered.groupby(['eo_main_class_description', 'eo_model_name', 'year', 'month'], as_index = False)[column_list_groupping].sum()
+  p11_raw_data['downtime'] = p11_raw_data['downtime'].apply(lambda x: round(x, 1))
+
+  p11_raw_data.rename(columns=initial_values.rename_columns_dict, inplace=True)
   # print(p11_raw_data)
 
   # column_list = ['eo_main_class_description', 'eo_model_name', 'eo_description', 'eo_code', 'eo_description', 'operation_start_date', 'operation_finish_date', 'year', 'month'] + actual_job_list

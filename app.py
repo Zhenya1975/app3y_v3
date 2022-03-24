@@ -17,6 +17,7 @@ import widget_fig_piechart_downtime_2023
 import widget_fig_piechart_downtime_2024
 import widget_fig_piechart_downtime_2025
 import ktg_table_html
+import p11_table_html
 import func_be_select_data_prep
 
 import widget_table_ktg
@@ -254,7 +255,7 @@ def maintanance(theme_selector, checklist_be):
   ktg_by_month_table = ktg_table_html.ktg_table(df_ktg_table)
 
   df_p11_table = widgets.widgets_data(theme_selector, be_list_for_dataframes_filtering)[6]
-  p11_table = ktg_table_html.ktg_table(df_p11_table)
+  p11_table = p11_table_html.ktg_table(df_p11_table)
 
   # обновить csv для выгрузки eo
   widget_download_eo.eo_list_download_preparation(be_list_for_dataframes_filtering)
